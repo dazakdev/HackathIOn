@@ -51,7 +51,7 @@ export const Route = createFileRoute("/signup")({
   head: () => ({
     meta: [
       {
-        title: "Sign Up - FastAPI Template",
+        title: "Zarejestruj się - Treneiro",
       },
     ],
   }),
@@ -86,8 +86,13 @@ function SignUp() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-6"
         >
-          <div className="flex flex-col items-center gap-2 text-center">
-            <h1 className="text-2xl font-bold">Create an account</h1>
+          <div className="flex flex-col gap-1">
+            <h1 className="text-3xl font-bold tracking-tight">
+              Utwórz konto.
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Zarejestruj się, aby dołączyć do platformy.
+            </p>
           </div>
 
           <div className="grid gap-4">
@@ -96,11 +101,11 @@ function SignUp() {
               name="full_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel>Imię i nazwisko</FormLabel>
                   <FormControl>
                     <Input
                       data-testid="full-name-input"
-                      placeholder="User"
+                      placeholder="Jan Kowalski"
                       type="text"
                       {...field}
                     />
@@ -119,7 +124,7 @@ function SignUp() {
                   <FormControl>
                     <Input
                       data-testid="email-input"
-                      placeholder="user@example.com"
+                      placeholder="twoj@email.com"
                       type="email"
                       {...field}
                     />
@@ -134,11 +139,11 @@ function SignUp() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Hasło</FormLabel>
                   <FormControl>
                     <PasswordInput
                       data-testid="password-input"
-                      placeholder="Password"
+                      placeholder="••••••••"
                       {...field}
                     />
                   </FormControl>
@@ -152,11 +157,11 @@ function SignUp() {
               name="confirm_password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
+                  <FormLabel>Potwierdź hasło</FormLabel>
                   <FormControl>
                     <PasswordInput
                       data-testid="confirm-password-input"
-                      placeholder="Confirm Password"
+                      placeholder="••••••••"
                       {...field}
                     />
                   </FormControl>
@@ -170,14 +175,14 @@ function SignUp() {
               className="w-full"
               loading={signUpMutation.isPending}
             >
-              Sign Up
+              Zarejestruj się
             </LoadingButton>
           </div>
 
           <div className="text-center text-sm">
-            Already have an account?{" "}
+            Masz już konto?{" "}
             <RouterLink to="/login" className="underline underline-offset-4">
-              Log in
+              Zaloguj się
             </RouterLink>
           </div>
         </form>

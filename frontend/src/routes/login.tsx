@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { LoadingButton } from "@/components/ui/loading-button"
 import { PasswordInput } from "@/components/ui/password-input"
+import { Separator } from "@/components/ui/separator"
 import useAuth, { isLoggedIn } from "@/hooks/useAuth"
 
 const formSchema = z.object({
@@ -44,7 +45,7 @@ export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       {
-        title: "Log In - FastAPI Template",
+        title: "Log In - Treneiro",
       },
     ],
   }),
@@ -72,24 +73,36 @@ function Login() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col gap-6"
+          className="flex flex-col gap-8"
         >
-          <div className="flex flex-col items-center gap-2 text-center">
-            <h1 className="text-2xl font-bold">Login to your account</h1>
+          {/* Header */}
+          <div className="flex flex-col gap-1">
+            <h1 className="text-3xl font-bold tracking-tight">
+              Witaj z powrotem.
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Zaloguj się, aby kontynuować naukę.
+            </p>
           </div>
 
-          <div className="grid gap-4">
+          <Separator />
+
+          {/* Form fields */}
+          <div className="grid gap-5">
             <FormField
               control={form.control}
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Email
+                  </FormLabel>
                   <FormControl>
                     <Input
                       data-testid="email-input"
-                      placeholder="user@example.com"
+                      placeholder="twoj@email.com"
                       type="email"
+                      className="h-11 rounded-lg"
                       {...field}
                     />
                   </FormControl>
@@ -103,19 +116,22 @@ function Login() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <div className="flex items-center">
-                    <FormLabel>Password</FormLabel>
+                  <div className="flex items-center justify-between">
+                    <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Hasło
+                    </FormLabel>
                     <RouterLink
                       to="/recover-password"
-                      className="ml-auto text-sm underline-offset-4 hover:underline"
+                      className="text-xs text-muted-foreground transition-colors hover:text-foreground"
                     >
-                      Forgot your password?
+                      Nie pamiętasz hasła?
                     </RouterLink>
                   </div>
                   <FormControl>
                     <PasswordInput
                       data-testid="password-input"
-                      placeholder="Password"
+                      placeholder="••••••••"
+                      className="h-11 rounded-lg"
                       {...field}
                     />
                   </FormControl>
@@ -124,17 +140,25 @@ function Login() {
               )}
             />
 
-            <LoadingButton type="submit" loading={loginMutation.isPending}>
-              Log In
+            <LoadingButton
+              type="submit"
+              className="h-11 rounded-lg text-sm font-semibold"
+              loading={loginMutation.isPending}
+            >
+              Zaloguj się
             </LoadingButton>
           </div>
 
-          <div className="text-center text-sm">
-            Don't have an account yet?{" "}
-            <RouterLink to="/signup" className="underline underline-offset-4">
-              Sign up
+          {/* Footer link */}
+          <p className="text-center text-sm text-muted-foreground">
+            Nie masz jeszcze konta?{" "}
+            <RouterLink
+              to="/signup"
+              className="font-medium text-foreground underline-offset-4 transition-colors hover:underline"
+            >
+              Zarejestruj się
             </RouterLink>
-          </div>
+          </p>
         </form>
       </Form>
     </AuthLayout>
