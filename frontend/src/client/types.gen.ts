@@ -75,6 +75,7 @@ export type UserPublic = {
     is_active?: boolean;
     is_superuser?: boolean;
     full_name?: (string | null);
+    total_points?: number;
     id: string;
     created_at?: (string | null);
 };

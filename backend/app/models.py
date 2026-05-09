@@ -241,9 +241,15 @@ class BossBattle(SQLModel, table=True):
         ondelete="SET NULL",
     )
     score: int = Field(default=0)
-    max_score: int
+    max_score: int = Field(default=100)
+    boss_hp_start: int = Field(default=100)
+    boss_hp_end: int = Field(default=0)
+    player_damage_total: int = Field(default=0)
+    accuracy_avg: float = Field(default=0.0)
+    combo_count: int = Field(default=0)
+    victory: bool = Field(default=False)
     completed_at: datetime | None = Field(
-        default_factory=get_datetime_utc,
+        default=None,
         sa_type=SA_UTC_DATETIME,
     )
     game: Game | None = Relationship(back_populates="boss_battle")

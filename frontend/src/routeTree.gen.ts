@@ -16,8 +16,13 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
 import { Route as LayoutSettingsRouteImport } from './routes/_layout/settings'
-import { Route as LayoutItemsRouteImport } from './routes/_layout/items'
+import { Route as LayoutLeaderboardRouteImport } from './routes/_layout/leaderboard'
 import { Route as LayoutAdminRouteImport } from './routes/_layout/admin'
+import { Route as LayoutGamesNewRouteImport } from './routes/_layout/games/new'
+import { Route as LayoutGamesGameIdTrainingRouteImport } from './routes/_layout/games/$gameId/training'
+import { Route as LayoutGamesGameIdSummaryRouteImport } from './routes/_layout/games/$gameId/summary'
+import { Route as LayoutGamesGameIdQuizRouteImport } from './routes/_layout/games/$gameId/quiz'
+import { Route as LayoutGamesGameIdBossRouteImport } from './routes/_layout/games/$gameId/boss'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -53,9 +58,9 @@ const LayoutSettingsRoute = LayoutSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => LayoutRoute,
 } as any)
-const LayoutItemsRoute = LayoutItemsRouteImport.update({
-  id: '/items',
-  path: '/items',
+const LayoutLeaderboardRoute = LayoutLeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
   getParentRoute: () => LayoutRoute,
 } as any)
 const LayoutAdminRoute = LayoutAdminRouteImport.update({
@@ -63,16 +68,48 @@ const LayoutAdminRoute = LayoutAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => LayoutRoute,
 } as any)
+const LayoutGamesNewRoute = LayoutGamesNewRouteImport.update({
+  id: '/games/new',
+  path: '/games/new',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutGamesGameIdTrainingRoute =
+  LayoutGamesGameIdTrainingRouteImport.update({
+    id: '/games/$gameId/training',
+    path: '/games/$gameId/training',
+    getParentRoute: () => LayoutRoute,
+  } as any)
+const LayoutGamesGameIdSummaryRoute =
+  LayoutGamesGameIdSummaryRouteImport.update({
+    id: '/games/$gameId/summary',
+    path: '/games/$gameId/summary',
+    getParentRoute: () => LayoutRoute,
+  } as any)
+const LayoutGamesGameIdQuizRoute = LayoutGamesGameIdQuizRouteImport.update({
+  id: '/games/$gameId/quiz',
+  path: '/games/$gameId/quiz',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutGamesGameIdBossRoute = LayoutGamesGameIdBossRouteImport.update({
+  id: '/games/$gameId/boss',
+  path: '/games/$gameId/boss',
+  getParentRoute: () => LayoutRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof LayoutIndexRoute
   '/login': typeof LoginRoute
   '/recover-password': typeof RecoverPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/admin': typeof LayoutAdminRoute
-  '/items': typeof LayoutItemsRoute
+  '/leaderboard': typeof LayoutLeaderboardRoute
   '/settings': typeof LayoutSettingsRoute
-  '/': typeof LayoutIndexRoute
+  '/games/new': typeof LayoutGamesNewRoute
+  '/games/$gameId/boss': typeof LayoutGamesGameIdBossRoute
+  '/games/$gameId/quiz': typeof LayoutGamesGameIdQuizRoute
+  '/games/$gameId/summary': typeof LayoutGamesGameIdSummaryRoute
+  '/games/$gameId/training': typeof LayoutGamesGameIdTrainingRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -80,9 +117,14 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/admin': typeof LayoutAdminRoute
-  '/items': typeof LayoutItemsRoute
+  '/leaderboard': typeof LayoutLeaderboardRoute
   '/settings': typeof LayoutSettingsRoute
   '/': typeof LayoutIndexRoute
+  '/games/new': typeof LayoutGamesNewRoute
+  '/games/$gameId/boss': typeof LayoutGamesGameIdBossRoute
+  '/games/$gameId/quiz': typeof LayoutGamesGameIdQuizRoute
+  '/games/$gameId/summary': typeof LayoutGamesGameIdSummaryRoute
+  '/games/$gameId/training': typeof LayoutGamesGameIdTrainingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -92,21 +134,31 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/_layout/admin': typeof LayoutAdminRoute
-  '/_layout/items': typeof LayoutItemsRoute
+  '/_layout/leaderboard': typeof LayoutLeaderboardRoute
   '/_layout/settings': typeof LayoutSettingsRoute
   '/_layout/': typeof LayoutIndexRoute
+  '/_layout/games/new': typeof LayoutGamesNewRoute
+  '/_layout/games/$gameId/boss': typeof LayoutGamesGameIdBossRoute
+  '/_layout/games/$gameId/quiz': typeof LayoutGamesGameIdQuizRoute
+  '/_layout/games/$gameId/summary': typeof LayoutGamesGameIdSummaryRoute
+  '/_layout/games/$gameId/training': typeof LayoutGamesGameIdTrainingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/login'
     | '/recover-password'
     | '/reset-password'
     | '/signup'
     | '/admin'
-    | '/items'
+    | '/leaderboard'
     | '/settings'
-    | '/'
+    | '/games/new'
+    | '/games/$gameId/boss'
+    | '/games/$gameId/quiz'
+    | '/games/$gameId/summary'
+    | '/games/$gameId/training'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -114,9 +166,14 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/admin'
-    | '/items'
+    | '/leaderboard'
     | '/settings'
     | '/'
+    | '/games/new'
+    | '/games/$gameId/boss'
+    | '/games/$gameId/quiz'
+    | '/games/$gameId/summary'
+    | '/games/$gameId/training'
   id:
     | '__root__'
     | '/_layout'
@@ -125,9 +182,14 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/_layout/admin'
-    | '/_layout/items'
+    | '/_layout/leaderboard'
     | '/_layout/settings'
     | '/_layout/'
+    | '/_layout/games/new'
+    | '/_layout/games/$gameId/boss'
+    | '/_layout/games/$gameId/quiz'
+    | '/_layout/games/$gameId/summary'
+    | '/_layout/games/$gameId/training'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,7 +233,7 @@ declare module '@tanstack/react-router' {
     '/_layout': {
       id: '/_layout'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof LayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -189,11 +251,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutSettingsRouteImport
       parentRoute: typeof LayoutRoute
     }
-    '/_layout/items': {
-      id: '/_layout/items'
-      path: '/items'
-      fullPath: '/items'
-      preLoaderRoute: typeof LayoutItemsRouteImport
+    '/_layout/leaderboard': {
+      id: '/_layout/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LayoutLeaderboardRouteImport
       parentRoute: typeof LayoutRoute
     }
     '/_layout/admin': {
@@ -203,21 +265,66 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutAdminRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/games/new': {
+      id: '/_layout/games/new'
+      path: '/games/new'
+      fullPath: '/games/new'
+      preLoaderRoute: typeof LayoutGamesNewRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/games/$gameId/training': {
+      id: '/_layout/games/$gameId/training'
+      path: '/games/$gameId/training'
+      fullPath: '/games/$gameId/training'
+      preLoaderRoute: typeof LayoutGamesGameIdTrainingRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/games/$gameId/summary': {
+      id: '/_layout/games/$gameId/summary'
+      path: '/games/$gameId/summary'
+      fullPath: '/games/$gameId/summary'
+      preLoaderRoute: typeof LayoutGamesGameIdSummaryRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/games/$gameId/quiz': {
+      id: '/_layout/games/$gameId/quiz'
+      path: '/games/$gameId/quiz'
+      fullPath: '/games/$gameId/quiz'
+      preLoaderRoute: typeof LayoutGamesGameIdQuizRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/games/$gameId/boss': {
+      id: '/_layout/games/$gameId/boss'
+      path: '/games/$gameId/boss'
+      fullPath: '/games/$gameId/boss'
+      preLoaderRoute: typeof LayoutGamesGameIdBossRouteImport
+      parentRoute: typeof LayoutRoute
+    }
   }
 }
 
 interface LayoutRouteChildren {
   LayoutAdminRoute: typeof LayoutAdminRoute
-  LayoutItemsRoute: typeof LayoutItemsRoute
+  LayoutLeaderboardRoute: typeof LayoutLeaderboardRoute
   LayoutSettingsRoute: typeof LayoutSettingsRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
+  LayoutGamesNewRoute: typeof LayoutGamesNewRoute
+  LayoutGamesGameIdBossRoute: typeof LayoutGamesGameIdBossRoute
+  LayoutGamesGameIdQuizRoute: typeof LayoutGamesGameIdQuizRoute
+  LayoutGamesGameIdSummaryRoute: typeof LayoutGamesGameIdSummaryRoute
+  LayoutGamesGameIdTrainingRoute: typeof LayoutGamesGameIdTrainingRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutAdminRoute: LayoutAdminRoute,
-  LayoutItemsRoute: LayoutItemsRoute,
+  LayoutLeaderboardRoute: LayoutLeaderboardRoute,
   LayoutSettingsRoute: LayoutSettingsRoute,
   LayoutIndexRoute: LayoutIndexRoute,
+  LayoutGamesNewRoute: LayoutGamesNewRoute,
+  LayoutGamesGameIdBossRoute: LayoutGamesGameIdBossRoute,
+  LayoutGamesGameIdQuizRoute: LayoutGamesGameIdQuizRoute,
+  LayoutGamesGameIdSummaryRoute: LayoutGamesGameIdSummaryRoute,
+  LayoutGamesGameIdTrainingRoute: LayoutGamesGameIdTrainingRoute,
 }
 
 const LayoutRouteWithChildren =
