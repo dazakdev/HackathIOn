@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { ChevronRight, Loader2, Send, Bot, User, Award, Info } from "lucide-react"
+import { ChevronRight, Loader2, Send, Bot, User, Award, Info, X, Clock3 } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
 import { toast } from "sonner"
 import { GamesApi, type TrainingQuestionData } from "@/lib/gameApi"
@@ -12,11 +12,6 @@ export const Route = createFileRoute("/_layout/games/$gameId/training")({
   head: () => ({ meta: [{ title: "Trening - Sensai" }] }),
 })
 
-const DIFFICULTY_COLOR: Record<string, string> = {
-  easy: "text-green-500 bg-green-500/10 border-green-500/20",
-  medium: "text-yellow-500 bg-yellow-500/10 border-yellow-500/20",
-  hard: "text-red-500 bg-red-500/10 border-red-500/20",
-}
 
 function ScoreIndicator({ score }: { score: number }) {
   const color =
@@ -47,7 +42,7 @@ function ChatMessage({
   if (isSystem) {
     return (
       <div className="flex justify-center my-4 animate-in fade-in zoom-in duration-300">
-        <div className="bg-muted/50 border px-4 py-2 rounded-full text-xs text-muted-foreground max-w-[80%] text-center leading-relaxed">
+        <div className="bg-white/10 border border-white/10 px-4 py-2 rounded-full text-xs text-white/70 max-w-[80%] text-center leading-relaxed">
           {children || content}
         </div>
       </div>
@@ -55,18 +50,12 @@ function ChatMessage({
   }
 
   return (
-    <div className={`flex gap-4 my-6 w-full animate-in fade-in slide-in-from-bottom-2 ${isSensai ? "flex-row-reverse" : ""}`}>
-      {/* Avatar */}
-      <div className={`shrink-0 flex items-center justify-center h-10 w-10 rounded-full shadow-sm border-2 ${isStudent ? "bg-blue-500/10 border-blue-500/20 text-blue-500" : "bg-primary/10 border-primary/20 text-primary"}`}>
-        {isStudent ? <Bot className="h-5 w-5" /> : <User className="h-5 w-5" />}
+    <div className={`flex gap-4 my-6 w-full ${isSensai ? "flex-row-reverse" : ""}`}>
+      <div className="shrink-0 size-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
+        {isStudent ? <Bot className="h-4 w-4 text-white/70" /> : <User className="h-4 w-4 text-white/70" />}
       </div>
-      
-      {/* Message Body */}
-      <div className={`flex flex-col max-w-[85%] md:max-w-[75%] ${isSensai ? "items-end" : "items-start"}`}>
-        <div className={`text-xs font-semibold mb-1 opacity-70 ${isSensai ? "text-right" : "text-left"}`}>
-          {isStudent ? "Uczeń" : "Sensai (Ty)"}
-        </div>
-        <div className={`relative px-5 py-3.5 shadow-sm leading-relaxed text-sm ${isSensai ? "bg-primary text-primary-foreground rounded-2xl rounded-tr-none" : "bg-card border rounded-2xl rounded-tl-none"}`}>
+      <div className={`max-w-[70%] ${isSensai ? "text-right" : "text-left"}`}>
+        <div className={`inline-block rounded-2xl px-4 py-3 text-sm shadow-lg ${isSensai ? "bg-white text-black" : "bg-black/40 text-white"}`}>
           {content}
           {children}
         </div>
@@ -151,144 +140,133 @@ function TrainingPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto h-[calc(100vh-8rem)] flex flex-col rounded-3xl overflow-hidden border bg-background shadow-sm">
-      
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 bg-card border-b z-10 shrink-0 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-            <Bot className="h-6 w-6" />
-          </div>
-          <div>
-            <h1 className="text-lg font-black tracking-tight leading-none">Trening Ucznia</h1>
-            <p className="text-muted-foreground text-xs font-medium mt-1">
-              {answered} z {total} pytań odpowiedziane
-            </p>
-          </div>
+    <div className="mx-auto max-w-[1200px] h-[calc(100vh-8rem)] rounded-3xl overflow-hidden border border-white/10 bg-[#2f2f2f] shadow-[0_30px_80px_rgba(0,0,0,0.4)] flex flex-col">
+      <div className="h-12 bg-[#3b3b3b] flex items-center px-6 text-xs text-white/80">
+        <div className="flex items-center gap-2 font-semibold">
+          <X className="h-4 w-4" /> Wprowadzenie do Stoicyzmu
         </div>
-        
-        <div className="w-32 hidden sm:block">
-          <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-            <div
-              className="h-full rounded-full bg-primary transition-all duration-500"
-              style={{ width: total > 0 ? `${(answered / total) * 100}%` : "0%" }}
-            />
+        <div className="flex-1 flex items-center justify-center gap-6">
+          <span className="uppercase tracking-widest">Część {answered + 1} z {total}</span>
+          <div className="w-40 h-1.5 rounded-full bg-white/10 overflow-hidden">
+            <div className="h-full bg-white" style={{ width: total > 0 ? `${(answered / total) * 100}%` : "0%" }} />
           </div>
+          <span className="font-semibold">{Math.round((answered / Math.max(total, 1)) * 100)}%</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Clock3 className="h-4 w-4" /> 12:45
         </div>
       </div>
 
-      {/* Chat History */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 md:p-6 bg-muted/10 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
-        <ChatMessage role="system">
-          Rozpoczęto sesję treningową. Uczeń zada Ci 10 pytań opartych na tekście źródłowym.
-          Twoim zadaniem jako Sensai jest udzielenie jak najbardziej precyzyjnych i wyczerpujących odpowiedzi.
-        </ChatMessage>
+      <div className="flex-1 grid md:grid-cols-[280px_1fr]">
+        <aside className="border-r border-white/10 flex flex-col items-center justify-center gap-6 p-6">
+          <button className="rounded-2xl bg-white text-black px-6 py-3 text-sm font-semibold shadow-lg">
+            ALE SUPER!
+          </button>
+          <img src="/assets/images/student.gif" alt="Uczeń" className="w-40" />
+        </aside>
 
-        {displayQuestions.map((q, idx) => {
-          // If question is not reached yet (and not the current one), hide it
-          if (q.score === null && q.id !== currentQuestion?.id) return null
+        <div className="flex flex-col">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6">
+            {displayQuestions.map((q, idx) => {
+              if (q.score === null && q.id !== currentQuestion?.id) return null
 
-          return (
-            <div key={q.id} className="mb-8">
-              {/* Student asks question */}
-              <ChatMessage role="student">
-                <div className="mb-2 text-xs font-bold uppercase tracking-wider opacity-60 flex items-center gap-2">
-                  <span>Pytanie {idx + 1}</span>
-                  <span className={`px-1.5 py-0.5 rounded-sm border ${DIFFICULTY_COLOR[q.difficulty] ?? ""}`}>
-                    {q.difficulty}
-                  </span>
-                </div>
-                {q.question_text}
-              </ChatMessage>
-
-              {/* Sensai's answer */}
-              {q.user_answer && (
-                <ChatMessage role="sensai">
-                  {q.user_answer}
-                </ChatMessage>
-              )}
-
-              {/* System Feedback */}
-              {q.score !== null && (
-                <ChatMessage role="system">
-                  <div className="flex flex-col gap-3 text-left w-full max-w-lg">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-foreground">Ocena modelu AI:</span>
-                      <ScoreIndicator score={q.score} />
+              return (
+                <div key={q.id} className="mb-10">
+                  <ChatMessage role="student">
+                    <div className="mb-2 text-[11px] uppercase tracking-widest opacity-70">
+                      Pytanie {idx + 1}
                     </div>
-                    {q.feedback && (
-                      <div className="text-xs text-foreground/80 leading-relaxed border-l-2 border-primary/30 pl-3">
-                        <span className="font-semibold block mb-1">Feedback:</span>
-                        {q.feedback}
-                      </div>
-                    )}
-                    {q.ideal_answer && (
-                      <div className="text-xs text-foreground/80 leading-relaxed border-l-2 border-green-500/50 pl-3 mt-1">
-                        <span className="font-semibold text-green-600 dark:text-green-400 flex items-center gap-1 mb-1">
-                          <Info className="h-3 w-3" /> Wzorcowa odpowiedź:
-                        </span>
-                        {q.ideal_answer}
-                      </div>
-                    )}
-                  </div>
-                </ChatMessage>
-              )}
-            </div>
-          )
-        })}
+                    {q.question_text}
+                  </ChatMessage>
 
-        {isPending && (
-          <ChatMessage role="system">
-            <div className="flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin text-primary" />
-              <span>Sensai analizuje Twoją odpowiedź...</span>
-            </div>
-          </ChatMessage>
-        )}
-        
-        <div className="h-4" /> {/* Bottom padding element */}
-      </div>
+                  {q.user_answer && (
+                    <ChatMessage role="sensai">
+                      {q.user_answer}
+                    </ChatMessage>
+                  )}
 
-      {/* Input Area / Action Footer */}
-      <div className="shrink-0 p-4 bg-card border-t shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
-        {allAnswered ? (
-          <div className="flex flex-col items-center justify-center p-4">
-            <p className="text-sm font-bold text-muted-foreground mb-4">Trening zakończony! Uczeń jest gotowy do walki.</p>
-            <Button size="lg" className="w-full max-w-sm gap-2 font-bold h-12 shadow-lg shadow-primary/20 hover:shadow-primary/30" onClick={goToBoss}>
-              Walcz z Bossem <ChevronRight className="h-5 w-5" />
-            </Button>
+                  {q.score !== null && (
+                    <ChatMessage role="system">
+                      <div className="flex flex-col gap-3 text-left">
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-white">Ocena modelu AI:</span>
+                          <ScoreIndicator score={q.score} />
+                        </div>
+                        {q.feedback && (
+                          <div className="text-xs text-white/70 leading-relaxed">
+                            {q.feedback}
+                          </div>
+                        )}
+                        {q.ideal_answer && (
+                          <div className="text-xs text-white/70 leading-relaxed">
+                            <span className="font-semibold text-white flex items-center gap-1 mb-1">
+                              <Info className="h-3 w-3" /> Wzorcowa odpowiedź:
+                            </span>
+                            {q.ideal_answer}
+                          </div>
+                        )}
+                      </div>
+                    </ChatMessage>
+                  )}
+                </div>
+              )
+            })}
+
+            {isPending && (
+              <ChatMessage role="system">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Sensai analizuje Twoją odpowiedź...</span>
+                </div>
+              </ChatMessage>
+            )}
           </div>
-        ) : (
-          currentQuestion && (
-            <div className="flex items-end gap-3 max-w-4xl mx-auto">
-              <div className="flex-1 relative">
-                <textarea
-                  className="w-full min-h-[60px] max-h-[160px] rounded-2xl border border-input bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-y scrollbar-thin"
-                  placeholder="Napisz odpowiedź do ucznia..."
-                  value={currentAnswer}
-                  onChange={(e) => setCurrentAnswer(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      if (currentAnswer.trim().length >= 3 && !isPending) {
-                        submitAnswer(currentAnswer.trim());
-                      }
-                    }
-                  }}
-                  disabled={isPending}
-                />
+
+          <div className="p-6 border-t border-white/10">
+            {allAnswered ? (
+              <div className="flex flex-col items-center justify-center p-4">
+                <p className="text-sm font-semibold text-white/70 mb-4">Trening zakończony! Uczeń jest gotowy do walki.</p>
+                <Button size="lg" className="w-full max-w-sm gap-2 font-bold h-12" onClick={goToBoss}>
+                  Walcz z Bossem <ChevronRight className="h-5 w-5" />
+                </Button>
               </div>
-              <Button
-                size="icon"
-                className="h-12 w-12 shrink-0 rounded-2xl shadow-md transition-all disabled:opacity-50"
-                disabled={isPending || currentAnswer.trim().length < 3}
-                onClick={() => submitAnswer(currentAnswer.trim())}
-              >
-                {isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5 ml-1" />}
-              </Button>
-            </div>
-          )
-        )}
+            ) : (
+              currentQuestion && (
+                <div className="flex items-end gap-3">
+                  <div className="flex-1">
+                    <textarea
+                      className="w-full min-h-[60px] rounded-2xl border border-white/10 bg-[#3b3b3b] px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/40 resize-none"
+                      placeholder="Wyjaśnij swojemu uczniowi..."
+                      value={currentAnswer}
+                      onChange={(e) => setCurrentAnswer(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault()
+                          if (currentAnswer.trim().length >= 3 && !isPending) {
+                            submitAnswer(currentAnswer.trim())
+                          }
+                        }
+                      }}
+                      disabled={isPending}
+                    />
+                    <div className="flex items-center justify-between text-[11px] text-white/40 mt-2">
+                      <span>Wskazówka: Użyj analogii z życia codziennego.</span>
+                      <span>Press Enter to send</span>
+                    </div>
+                  </div>
+                  <Button
+                    size="icon"
+                    className="h-11 w-11 rounded-full bg-black text-white"
+                    disabled={isPending || currentAnswer.trim().length < 3}
+                    onClick={() => submitAnswer(currentAnswer.trim())}
+                  >
+                    {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  </Button>
+                </div>
+              )
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )

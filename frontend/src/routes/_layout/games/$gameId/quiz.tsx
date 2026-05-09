@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { CheckCircle, ChevronRight, Loader2, XCircle, BookOpen } from "lucide-react"
+import { CheckCircle, ChevronRight, Loader2, X, Clock3 } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { GamesApi, type QuizQuestionData } from "@/lib/gameApi"
@@ -30,23 +30,25 @@ function OptionButton({
   onClick: () => void
 }) {
   let cls =
-    "w-full text-left rounded-xl border-2 p-4 text-base transition-all duration-200 flex items-start gap-4 "
+    "w-full text-left rounded-2xl border px-4 py-3 text-sm transition-all duration-200 flex items-start gap-3 "
   if (!revealed) {
     cls += selected
-      ? "border-primary bg-primary/10 ring-2 ring-primary/20"
-      : "border-border hover:border-primary/50 hover:bg-muted/50 cursor-pointer"
+      ? "border-primary bg-primary/10"
+      : "border-border/60 bg-card/80 hover:border-primary/40 hover:bg-card"
   } else if (correct) {
     cls += "border-green-500 bg-green-500/10 text-green-600 dark:text-green-400 font-medium"
   } else if (selected && !correct) {
     cls += "border-red-500 bg-red-500/10 text-red-600 dark:text-red-400 font-medium"
   } else {
-    cls += "border-border opacity-50"
+    cls += "border-border/50 opacity-60"
   }
 
   return (
     <button className={cls} onClick={revealed ? undefined : onClick} disabled={revealed}>
-      <span className="shrink-0 font-bold opacity-60 text-lg w-6">{label}.</span>
-      <span className="leading-relaxed">{text}</span>
+      <span className={`shrink-0 size-8 rounded-full border flex items-center justify-center text-xs font-semibold ${selected ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground"}`}>
+        {label}
+      </span>
+      <span className="leading-relaxed text-sm">{text}</span>
     </button>
   )
 }
@@ -101,8 +103,10 @@ function QuestionCard({
   const revealed = result !== null
 
   return (
-    <div className="space-y-6">
-      <h3 className="text-xl font-bold leading-relaxed">{question.question_text}</h3>
+    <div className="space-y-5">
+      <h3 className="text-sm font-semibold leading-relaxed text-foreground/90">
+        {question.question_text}
+      </h3>
 
       <div className="space-y-3">
         {OPTION_KEYS.map((key) => (
@@ -123,26 +127,17 @@ function QuestionCard({
       </div>
 
       {isPending && (
-        <div className="flex items-center justify-center gap-2 text-sm text-primary py-4">
-          <Loader2 className="h-5 w-5 animate-spin" /> <span>Sprawdzam odpowiedź…</span>
+        <div className="flex items-center justify-center gap-2 text-xs text-primary py-2">
+          <Loader2 className="h-4 w-4 animate-spin" /> <span>Sprawdzam odpowiedź…</span>
         </div>
       )}
 
       {revealed && result && (
-        <div
-          className={`rounded-xl p-5 border-l-4 shadow-sm animate-in fade-in slide-in-from-bottom-2 ${result.is_correct ? "bg-green-500/10 border-green-500 text-green-700 dark:text-green-300" : "bg-red-500/10 border-red-500 text-red-700 dark:text-red-300"}`}
-        >
-          <div className="flex items-center gap-2 font-bold text-lg mb-2">
-            {result.is_correct ? (
-              <CheckCircle className="h-6 w-6" />
-            ) : (
-              <XCircle className="h-6 w-6" />
-            )}
-            {result.is_correct ? "Poprawna odpowiedź!" : `Błędna odpowiedź. Prawidłowa to: ${result.correct_answer}`}
-          </div>
-          {result.explanation && (
-            <p className="text-sm opacity-90 leading-relaxed mt-2">{result.explanation}</p>
-          )}
+        <div className="rounded-full px-4 py-2 text-xs font-semibold bg-green-500/20 text-green-700 dark:text-green-300 flex items-center gap-2">
+          <CheckCircle className="h-4 w-4" />
+          {result.is_correct
+            ? "Doskonale! To kluczowa zasada dychotomii kontroli."
+            : `Błędna odpowiedź. Poprawna: ${result.correct_answer}`}
         </div>
       )}
     </div>
@@ -210,105 +205,97 @@ function QuizPage() {
   }
 
   const answeredCount = Object.keys(quiz.answers ?? {}).length
-  const progressPercent = Math.round((answeredCount / questions.length) * 100)
+  const progressPercent = questions.length > 0
+    ? Math.round((answeredCount / questions.length) * 100)
+    : 0
 
   return (
-    <div className="flex flex-col lg:flex-row gap-0 h-[calc(100vh-8rem)] rounded-3xl overflow-hidden border shadow-sm bg-card">
-      {/* Left: Source text with background */}
-      <div className="lg:w-5/12 flex flex-col relative min-h-[30vh]">
-        {/* Background image for the text area */}
-        <div 
-          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-20 dark:opacity-10"
-          style={{ backgroundImage: "url('/background.jpg')" }}
-        />
-        <div className="absolute inset-0 z-0 bg-gradient-to-b from-background/80 to-background/95" />
-        
-        <div className="relative z-10 flex flex-col h-full p-8">
-          <div className="flex items-center gap-3 mb-6 opacity-80">
-            <div className="bg-primary/20 p-2 rounded-xl text-primary">
-              <BookOpen className="h-5 w-5" />
+    <div className="min-h-svh bg-[url('/background.jpg')] bg-cover bg-center relative">
+      <div className="absolute inset-0 bg-[#8e89a8]/75 dark:bg-black/70" />
+
+      <div className="relative z-10 flex flex-col min-h-svh">
+        <header className="h-12 bg-white/90 dark:bg-[#3a3a3a]/90 border-b border-white/30 dark:border-white/10 flex items-center px-6 text-sm">
+          <button className="flex items-center gap-2 font-semibold">
+            <X className="h-4 w-4" /> {quiz.title}
+          </button>
+          <div className="flex-1 flex items-center justify-center gap-4 text-xs text-muted-foreground">
+            <span className="uppercase tracking-widest">Część {currentQuestion + 1} z {questions.length}</span>
+            <div className="w-40 h-1.5 rounded-full bg-muted overflow-hidden">
+              <div className="h-full bg-primary" style={{ width: `${progressPercent}%` }} />
             </div>
-            <h2 className="text-sm font-bold uppercase tracking-wider">
-              Tekst źródłowy
-            </h2>
+            <span className="font-semibold">{progressPercent}%</span>
           </div>
-          
-          <div
-            ref={sourceRef}
-            onScroll={handleScroll}
-            className="flex-1 overflow-y-auto pr-4 text-base leading-relaxed whitespace-pre-wrap scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent text-foreground/90 font-medium"
-          >
-            {quiz.source_text ?? (
-              <span className="text-muted-foreground italic">
-                Wróć do głównej strony gry, aby zobaczyć tekst.
-              </span>
-            )}
+          <div className="flex items-center gap-2 text-xs font-semibold">
+            <Clock3 className="h-4 w-4" /> 12:45
           </div>
-        </div>
-      </div>
+        </header>
 
-      {/* Right: Quiz Area */}
-      <div className="lg:w-7/12 flex flex-col min-h-0 bg-background relative border-l">
-        <div className="p-8 pb-4">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-xl font-black tracking-tight line-clamp-1">
-              {quiz.title}
-            </h2>
-            <div className="text-xs font-bold bg-muted px-3 py-1 rounded-full text-muted-foreground uppercase tracking-wider whitespace-nowrap">
-              Część {currentQuestion + 1} z {questions.length} / {progressPercent}%
-            </div>
+        <div className="flex-1 flex items-center justify-center px-6 py-10">
+          <div className="w-full max-w-5xl grid md:grid-cols-[1.5fr_1fr] gap-0 rounded-3xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.25)]">
+            <section className="bg-white/95 dark:bg-[#2f2f2f]/90 p-8">
+              <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-6">
+                <span className="rounded-full bg-muted px-3 py-1">Filozofia</span>
+              </div>
+              <h2 className="text-2xl font-semibold mb-4">{quiz.title}</h2>
+              <blockquote className="border-l-2 border-border pl-4 text-sm text-muted-foreground mb-6">
+                "Nie rzeczy nas niepokoją, lecz nasze o nich wyobrażenia." – Epiktet
+              </blockquote>
+              <div
+                ref={sourceRef}
+                onScroll={handleScroll}
+                className="text-sm leading-relaxed whitespace-pre-wrap max-h-[420px] overflow-y-auto pr-4"
+              >
+                {quiz.source_text ?? (
+                  <span className="text-muted-foreground italic">
+                    Wróć do głównej strony gry, aby zobaczyć tekst.
+                  </span>
+                )}
+              </div>
+            </section>
+
+            <section className="bg-[#f4f2f5]/95 dark:bg-[#323232]/90 p-8 flex flex-col justify-between">
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 text-sm font-semibold">
+                  <span className="size-6 rounded-full bg-primary/20 flex items-center justify-center text-primary">?</span>
+                  Sprawdź wiedzę
+                </div>
+                {q && (
+                  <QuestionCard
+                    key={q.id}
+                    question={q}
+                    existingAnswer={quiz.answers?.[q.id] as any}
+                    onAnswered={(done) => {
+                      if (done) {
+                        setAllAnswered(true)
+                      } else if (currentQuestion < questions.length - 1) {
+                        setTimeout(() => setCurrentQuestion((p) => p + 1), 1500)
+                      }
+                    }}
+                  />
+                )}
+              </div>
+
+              <div className="pt-6">
+                {allAnswered ? (
+                  <Button
+                    size="lg"
+                    className="w-full rounded-xl font-semibold bg-white text-black hover:bg-white/90"
+                    onClick={goToTraining}
+                  >
+                    Przejdź do treningu <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                ) : (
+                  <Button
+                    className="w-full rounded-xl font-semibold bg-white text-black hover:bg-white/90"
+                    onClick={() => setCurrentQuestion((p) => Math.min(questions.length - 1, p + 1))}
+                    disabled={currentQuestion === questions.length - 1}
+                  >
+                    Następna część
+                  </Button>
+                )}
+              </div>
+            </section>
           </div>
-          
-          <div className="h-2 w-full rounded-full bg-muted mt-4 overflow-hidden">
-            <div 
-              className="h-full bg-primary transition-all duration-500 ease-out"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-8 py-4">
-          {q && (
-            <QuestionCard
-              key={q.id}
-              question={q}
-              existingAnswer={quiz.answers?.[q.id] as any}
-              onAnswered={(done) => {
-                if (done) {
-                  setAllAnswered(true)
-                } else if (currentQuestion < questions.length - 1) {
-                  setTimeout(() => setCurrentQuestion((p) => p + 1), 1500)
-                }
-              }}
-            />
-          )}
-        </div>
-
-        {/* Navigation Footer */}
-        <div className="p-6 bg-muted/20 border-t flex items-center justify-between">
-          <Button
-            variant="ghost"
-            onClick={() => setCurrentQuestion((p) => Math.max(0, p - 1))}
-            disabled={currentQuestion === 0}
-            className="text-muted-foreground hover:text-foreground font-semibold"
-          >
-            Poprzednie
-          </Button>
-
-          {allAnswered ? (
-            <Button size="lg" className="gap-2 font-bold px-8 shadow-md" onClick={goToTraining}>
-              Przejdź do treningu <ChevronRight className="h-5 w-5" />
-            </Button>
-          ) : (
-            <Button
-              variant="secondary"
-              onClick={() => setCurrentQuestion((p) => Math.min(questions.length - 1, p + 1))}
-              disabled={currentQuestion === questions.length - 1}
-              className="font-semibold"
-            >
-              Następne
-            </Button>
-          )}
         </div>
       </div>
     </div>

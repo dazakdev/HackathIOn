@@ -1,20 +1,17 @@
 import { Home, Plus, Trophy, Users } from "lucide-react"
 
-import { SidebarAppearance } from "@/components/Common/Appearance"
 import { Logo } from "@/components/Common/Logo"
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar"
 import useAuth from "@/hooks/useAuth"
 import { type Item, Main } from "./Main"
-import { User } from "./User"
 
 const baseItems: Item[] = [
-  { icon: Home, title: "Dashboard", path: "/" },
-  { icon: Plus, title: "Nowa gra", path: "/games/new" },
+  { icon: Home, title: "Panel główny", path: "/" },
+  { icon: Plus, title: "Rozpocznij nową przygodę", path: "/games/new" },
   { icon: Trophy, title: "Ranking", path: "/leaderboard" },
 ]
 
@@ -26,17 +23,18 @@ export function AppSidebar() {
     : baseItems
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader className="px-4 py-6 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:items-center">
-        <Logo variant="responsive" />
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border/60">
+      <SidebarHeader className="px-6 py-6 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:items-center">
+        <div className="flex flex-col gap-2">
+          <Logo variant="responsive" />
+          <p className="text-xs text-muted-foreground font-medium tracking-wide">
+            Stocz swoją walkę
+          </p>
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <Main items={items} />
       </SidebarContent>
-      <SidebarFooter>
-        <SidebarAppearance />
-        <User user={currentUser} />
-      </SidebarFooter>
     </Sidebar>
   )
 }

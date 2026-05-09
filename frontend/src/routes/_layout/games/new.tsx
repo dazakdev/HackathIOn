@@ -1,12 +1,12 @@
 import { useMutation } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { BookOpen, Settings2, ShieldAlert, Zap, Loader2 } from "lucide-react"
+import { ArrowLeft, BookOpen, FolderOpen, ShieldAlert, Zap, Loader2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { GamesApi } from "@/lib/gameApi"
 import { useGameStore } from "@/stores/gameStore"
+import { Logo } from "@/components/Common/Logo"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
 export const Route = createFileRoute("/_layout/games/new")({
@@ -39,126 +39,137 @@ function NewGame() {
   })
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-10">
-      <div>
-        <h1 className="text-3xl font-black tracking-tight">Nowa sesja nauki</h1>
-        <p className="text-muted-foreground mt-2 text-lg">
-          Skonfiguruj parametry sesji i wklej tekst źródłowy. Sensai zajmie się resztą.
-        </p>
-      </div>
+    <div className="min-h-svh relative bg-[url('/background.jpg')] bg-cover bg-center">
+      <div className="absolute inset-0 bg-[#8e89a8]/80 dark:bg-black/70" />
 
-      <div className="grid md:grid-cols-3 gap-6">
-        {/* Left Column: Config */}
-        <div className="md:col-span-1 space-y-6">
-          <Card className="shadow-sm border-primary/10">
-            <CardHeader className="bg-muted/30 pb-4 border-b">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Settings2 className="h-5 w-5 text-primary" /> Metadane
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 pt-6">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold">Nazwa sesji</label>
-                <Input
-                  placeholder="Np. Historia starożytnego Rzymu"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  disabled={isPending}
-                />
+      <div className="relative z-10 flex flex-col items-center px-6 pb-16">
+        <div className="w-full max-w-5xl pt-8">
+          <div className="rounded-full bg-card/90 dark:bg-black/30 border border-white/30 dark:border-white/10 px-6 py-3 flex items-center justify-between shadow-lg">
+            <button className="flex items-center gap-2 text-sm font-medium">
+              <ArrowLeft className="h-4 w-4" /> Przerwij
+            </button>
+            <Logo variant="icon" className="h-6 w-auto" asLink={false} />
+          </div>
+        </div>
+
+        <div className="text-center mt-12 space-y-2 text-white">
+          <h1 className="text-3xl font-semibold">Wykuj nową wiedzę</h1>
+          <p className="text-sm text-white/80">
+            Zostań najlepszym posiadaczem wiedzy i naucz swojego ucznia,
+            który stanie do walki w imię świętej wiedzy
+          </p>
+        </div>
+
+        <div className="w-full max-w-2xl mt-10 space-y-6">
+          <section className="rounded-2xl bg-card/90 dark:bg-[#2f2f2f]/80 border border-white/30 dark:border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.25)]">
+            <div className="px-6 py-4 flex items-center gap-2 text-sm font-semibold">
+              <FolderOpen className="h-4 w-4" /> Materiał Źródłowy
+            </div>
+            <div className="px-6 pb-6">
+              <textarea
+                className="w-full min-h-[160px] rounded-xl border border-border/50 bg-background/70 dark:bg-black/20 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                placeholder="Wklej tutaj notatki, fragment artykułu lub definicje pojęć..."
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                disabled={isPending}
+              />
+            </div>
+          </section>
+
+          <section className="rounded-2xl bg-card/90 dark:bg-[#2f2f2f]/80 border border-white/30 dark:border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.25)]">
+            <div className="px-6 py-4 flex items-center gap-2 text-sm font-semibold">
+              <BookOpen className="h-4 w-4" /> Modyfikuj przygodę
+            </div>
+            <div className="px-6 pb-6 grid gap-4 md:grid-cols-[1fr_1.2fr]">
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold">Nazwa</label>
+                  <Input
+                    placeholder="Nazwa przygody..."
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    disabled={isPending}
+                    className="rounded-xl bg-background/70 dark:bg-black/20"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold">Ikona</label>
+                  <div className="flex items-center gap-3">
+                    {["⚡", "✨", "🧠"].map((icon) => (
+                      <button
+                        key={icon}
+                        className={`size-9 rounded-full border text-sm ${icon === "✨" ? "bg-primary text-primary-foreground border-primary" : "bg-background/70 dark:bg-black/20 border-border"}`}
+                      >
+                        {icon}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold">Opis (opcjonalny)</label>
+                <label className="text-xs font-semibold">Opis</label>
                 <textarea
-                  className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-y"
-                  placeholder="Krótki opis czego dotyczy materiał..."
-                  rows={3}
+                  className="w-full min-h-[120px] rounded-xl border border-border/50 bg-background/70 dark:bg-black/20 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                  placeholder="Opis przygody..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   disabled={isPending}
                 />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </section>
 
-          <Card className="shadow-sm border-primary/10">
-            <CardHeader className="bg-muted/30 pb-4 border-b">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <ShieldAlert className="h-5 w-5 text-primary" /> Poziom Trudności
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="space-y-3">
-                {[
-                  { id: "easy", label: "Łatwy", desc: "Podstawowe pytania" },
-                  { id: "medium", label: "Średni", desc: "Wymaga zrozumienia" },
-                  { id: "hard", label: "Trudny", desc: "Ekspercki poziom detali" },
-                ].map((lvl) => (
-                  <button
-                    key={lvl.id}
-                    onClick={() => setDifficulty(lvl.id)}
-                    disabled={isPending}
-                    className={`w-full text-left p-3 rounded-xl border-2 transition-all ${difficulty === lvl.id
+          <section className="rounded-2xl bg-card/90 dark:bg-[#2f2f2f]/80 border border-white/30 dark:border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.25)]">
+            <div className="px-6 py-4 flex items-center gap-2 text-sm font-semibold">
+              <ShieldAlert className="h-4 w-4" /> Poziom Trudności
+            </div>
+            <div className="px-6 pb-6 space-y-3">
+              {[
+                { id: "easy", label: "Uczeń", desc: "Podstawowe testy wyboru i fiszki." },
+                { id: "medium", label: "Czeladnik", desc: "Zadania otwarte i analiza kontekstu." },
+                { id: "hard", label: "Mistrz", desc: "Rygorystyczne testy syntezy i luk." },
+              ].map((lvl) => (
+                <button
+                  key={lvl.id}
+                  onClick={() => setDifficulty(lvl.id)}
+                  disabled={isPending}
+                  className={`w-full text-left p-4 rounded-2xl border transition-all ${
+                    difficulty === lvl.id
                       ? "border-primary bg-primary/10"
-                      : "border-border hover:border-primary/50"
-                      }`}
-                  >
-                    <div className="font-bold">{lvl.label}</div>
-                    <div className="text-xs text-muted-foreground">{lvl.desc}</div>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                      : "border-border/60 bg-background/60 dark:bg-black/20"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`size-4 rounded-full border ${difficulty === lvl.id ? "border-primary bg-primary" : "border-muted-foreground"}`} />
+                    <div>
+                      <div className="text-sm font-semibold">{lvl.label}</div>
+                      <div className="text-xs text-muted-foreground">{lvl.desc}</div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
         </div>
 
-        {/* Right Column: Source Text */}
-        <div className="md:col-span-2 space-y-6">
-          <Card className="h-full flex flex-col shadow-sm border-primary/10">
-            <CardHeader className="bg-muted/30 pb-4 border-b">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <BookOpen className="h-5 w-5 text-primary" /> Tekst źródłowy
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col flex-1 space-y-4 pt-6">
-              <div className="flex-1 min-h-[300px]">
-                <textarea
-                  className="w-full h-full min-h-[350px] rounded-xl border bg-background px-4 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-y font-mono leading-relaxed"
-                  placeholder="Wklej tutaj tekst do nauki (min. 80 znaków)…"
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  disabled={isPending}
-                />
-              </div>
-              <div className="flex items-center justify-between text-sm font-medium">
-                <span className={text.length >= 80 ? "text-green-500" : "text-muted-foreground"}>
-                  {text.length} znaków
-                </span>
-                {text.length < 80 && text.length > 0 && (
-                  <span className="text-destructive font-semibold">Wymagane min. 80 znaków</span>
-                )}
-              </div>
-
-              <div className="pt-4 border-t mt-auto">
-                <Button
-                  size="lg"
-                  className="w-full gap-2 text-lg h-14"
-                  disabled={isPending || text.trim().length < 80}
-                  onClick={() => mutate(text.trim())}
-                >
-                  {isPending ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      Generuję quiz przez AI…
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="h-5 w-5" /> Utwórz sesję i wygeneruj quiz
-                    </>
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="mt-10">
+          <Button
+            size="lg"
+            className="rounded-full px-10 py-6 text-base font-semibold shadow-xl"
+            disabled={isPending || text.trim().length < 80}
+            onClick={() => mutate(text.trim())}
+          >
+            {isPending ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Generuję quiz…
+              </>
+            ) : (
+              <>
+                <Zap className="h-5 w-5" /> Stwórz przygodę
+              </>
+            )}
+          </Button>
         </div>
       </div>
     </div>
