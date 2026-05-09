@@ -1,0 +1,392 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.11, pytest-7.4.4, pluggy-1.6.0 -- /Users/depebul/Projects/Github/HackathIOn/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/depebul/Projects/Github/HackathIOn/backend
+plugins: anyio-4.12.1
+collecting ... collected 1 item
+
+tests/api/routes/test_users.py::test_delete_user_me FAILED               [100%]
+
+=================================== FAILURES ===================================
+_____________________________ test_delete_user_me ______________________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x10e6928a0>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x10cb425a0>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x10e6a1010>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x10e6a0f50>
+parameters = [{'param_1': UUID('e75f6843-ba1e-4b99-a48e-81ee46393adc')}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+../.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1967: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=localhost user=postgres database=app) at 0x10e575fd0>
+query = 'SELECT quiz_answers.id AS quiz_answers_id, quiz_answers.game_id AS quiz_answers_game_id, quiz_answers.question_id AS ...z_answers.answered_at AS quiz_answers_answered_at \nFROM quiz_answers \nWHERE %(param_1)s::UUID = quiz_answers.user_id'
+params = {'param_1': UUID('e75f6843-ba1e-4b99-a48e-81ee46393adc')}
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UndefinedColumn: column quiz_answers.explanation does not exist
+E           LINE 1: ...iz_answers.is_correct AS quiz_answers_is_correct, quiz_answe...
+E                                                                        ^
+
+../.venv/lib/python3.12/site-packages/psycopg/cursor.py:117: UndefinedColumn
+
+The above exception was the direct cause of the following exception:
+
+client = <starlette.testclient.TestClient object at 0x10e5147a0>
+db = <sqlmodel.orm.session.Session object at 0x10e4f9820>
+
+    def test_delete_user_me(client: TestClient, db: Session) -> None:
+        username = random_email()
+        password = random_lower_string()
+        user_in = UserCreate(email=username, password=password)
+        user = crud.create_user(session=db, user_create=user_in)
+        user_id = user.id
+    
+        login_data = {
+            "username": username,
+            "password": password,
+        }
+        r = client.post(f"{settings.API_V1_STR}/login/access-token", data=login_data)
+        tokens = r.json()
+        a_token = tokens["access_token"]
+        headers = {"Authorization": f"Bearer {a_token}"}
+    
+>       r = client.delete(
+            f"{settings.API_V1_STR}/users/me",
+            headers=headers,
+        )
+
+tests/api/routes/test_users.py:436: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../.venv/lib/python3.12/site-packages/starlette/testclient.py:627: in delete
+    return super().delete(
+../.venv/lib/python3.12/site-packages/httpx/_client.py:1251: in delete
+    return self.request(
+../.venv/lib/python3.12/site-packages/starlette/testclient.py:437: in request
+    return super().request(
+../.venv/lib/python3.12/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+../.venv/lib/python3.12/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+../.venv/lib/python3.12/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+../.venv/lib/python3.12/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+../.venv/lib/python3.12/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+../.venv/lib/python3.12/site-packages/starlette/testclient.py:340: in handle_request
+    raise exc
+../.venv/lib/python3.12/site-packages/starlette/testclient.py:337: in handle_request
+    portal.call(self.app, scope, receive, send)
+../.venv/lib/python3.12/site-packages/anyio/from_thread.py:334: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+../../../../.local/share/uv/python/cpython-3.12.11-macos-aarch64-none/lib/python3.12/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+../../../../.local/share/uv/python/cpython-3.12.11-macos-aarch64-none/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+../.venv/lib/python3.12/site-packages/anyio/from_thread.py:259: in _call_func
+    retval = await retval_or_awaitable
+../.venv/lib/python3.12/site-packages/fastapi/applications.py:1138: in __call__
+    await super().__call__(scope, receive, send)
+../.venv/lib/python3.12/site-packages/starlette/applications.py:112: in __call__
+    await self.middleware_stack(scope, receive, send)
+../.venv/lib/python3.12/site-packages/starlette/middleware/errors.py:187: in __call__
+    raise exc
+../.venv/lib/python3.12/site-packages/starlette/middleware/errors.py:165: in __call__
+    await self.app(scope, receive, _send)
+../.venv/lib/python3.12/site-packages/starlette/middleware/cors.py:85: in __call__
+    await self.app(scope, receive, send)
+../.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:62: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+../.venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+../.venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+../.venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+../.venv/lib/python3.12/site-packages/starlette/routing.py:714: in __call__
+    await self.middleware_stack(scope, receive, send)
+../.venv/lib/python3.12/site-packages/starlette/routing.py:734: in app
+    await route.handle(scope, receive, send)
+../.venv/lib/python3.12/site-packages/starlette/routing.py:288: in handle
+    await self.app(scope, receive, send)
+../.venv/lib/python3.12/site-packages/fastapi/routing.py:121: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+../.venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+../.venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+../.venv/lib/python3.12/site-packages/fastapi/routing.py:107: in app
+    response = await f(request)
+../.venv/lib/python3.12/site-packages/fastapi/routing.py:426: in app
+    raw_response = await run_endpoint_function(
+../.venv/lib/python3.12/site-packages/fastapi/routing.py:316: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+../.venv/lib/python3.12/site-packages/starlette/concurrency.py:37: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+../.venv/lib/python3.12/site-packages/anyio/to_thread.py:63: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+../.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2502: in run_sync_in_worker_thread
+    return await future
+../.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:986: in run
+    result = context.run(func, *args)
+app/api/routes/users.py:141: in delete_user_me
+    session.commit()
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2030: in commit
+    trans.commit(_to_root=True)
+<string>:2: in commit
+    ???
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:1311: in commit
+    self._prepare_impl()
+<string>:2: in _prepare_impl
+    ???
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:1286: in _prepare_impl
+    self.session.flush()
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4331: in flush
+    self._flush(objects)
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4466: in _flush
+    with util.safe_reraise():
+../.venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:224: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4427: in _flush
+    flush_context.execute()
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:442: in execute
+    postsort_actions = self._generate_actions()
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:400: in _generate_actions
+    if action.execute(self):
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:532: in execute
+    self.dependency_processor.presort_deletes(uow, delete_states)
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/dependency.py:448: in presort_deletes
+    history = uowcommit.get_attribute_history(
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:283: in get_attribute_history
+    history = impl.get_history(
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/attributes.py:1689: in get_history
+    current = self.get(state, dict_, passive=passive)
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/attributes.py:1096: in get
+    value = self._fire_loader_callables(state, key, passive)
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/attributes.py:1131: in _fire_loader_callables
+    return self.callable_(state, passive)
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/strategies.py:978: in _load_for_state
+    return self._emit_lazyload(
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/strategies.py:1141: in _emit_lazyload
+    result = session.execute(
+../.venv/lib/python3.12/site-packages/sqlmodel/orm/session.py:142: in execute
+    return super().execute(
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2351: in execute
+    return self._execute_internal(
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2249: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+../.venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py:306: in orm_execute_statement
+    result = conn.execute(
+../.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1419: in execute
+    return meth(
+../.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py:527: in _execute_on_connection
+    return connection._execute_clauseelement(
+../.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1641: in _execute_clauseelement
+    ret = self._execute_context(
+../.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1846: in _execute_context
+    return self._exec_single_context(
+../.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1986: in _exec_single_context
+    self._handle_dbapi_exception(
+../.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2363: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+../.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1967: in _exec_single_context
+    self.dialect.do_execute(
+../.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=localhost user=postgres database=app) at 0x10e575fd0>
+query = 'SELECT quiz_answers.id AS quiz_answers_id, quiz_answers.game_id AS quiz_answers_game_id, quiz_answers.question_id AS ...z_answers.answered_at AS quiz_answers_answered_at \nFROM quiz_answers \nWHERE %(param_1)s::UUID = quiz_answers.user_id'
+params = {'param_1': UUID('e75f6843-ba1e-4b99-a48e-81ee46393adc')}
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedColumn) column quiz_answers.explanation does not exist
+E           LINE 1: ...iz_answers.is_correct AS quiz_answers_is_correct, quiz_answe...
+E                                                                        ^
+E           [SQL: SELECT quiz_answers.id AS quiz_answers_id, quiz_answers.game_id AS quiz_answers_game_id, quiz_answers.question_id AS quiz_answers_question_id, quiz_answers.user_id AS quiz_answers_user_id, quiz_answers.selected_option AS quiz_answers_selected_option, quiz_answers.is_correct AS quiz_answers_is_correct, quiz_answers.explanation AS quiz_answers_explanation, quiz_answers.answered_at AS quiz_answers_answered_at 
+E           FROM quiz_answers 
+E           WHERE %(param_1)s::UUID = quiz_answers.user_id]
+E           [parameters: {'param_1': UUID('e75f6843-ba1e-4b99-a48e-81ee46393adc')}]
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+
+../.venv/lib/python3.12/site-packages/psycopg/cursor.py:117: ProgrammingError
+----------------------------- Captured stderr call -----------------------------
+INFO:httpx:HTTP Request: POST http://testserver/api/v1/login/access-token "HTTP/1.1 200 OK"
+------------------------------ Captured log call -------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/api/v1/login/access-token "HTTP/1.1 200 OK"
+=============================== warnings summary ===============================
+tests/api/routes/test_users.py::test_delete_user_me
+  /Users/depebul/Projects/Github/HackathIOn/.venv/lib/python3.12/site-packages/jwt/api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 8 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+    return self._jws.encode(
+
+tests/api/routes/test_users.py::test_delete_user_me
+  /Users/depebul/Projects/Github/HackathIOn/.venv/lib/python3.12/site-packages/jwt/api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 8 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+    decoded = self.decode_complete(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/api/routes/test_users.py::test_delete_user_me - sqlalchemy.exc.P...
+======================== 1 failed, 2 warnings in 0.47s =========================

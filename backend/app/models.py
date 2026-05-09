@@ -58,7 +58,6 @@ class User(UserBase, table=True):
         default_factory=get_datetime_utc,
         sa_type=SA_UTC_DATETIME,
     )
-    items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
     games: list["Game"] = Relationship(back_populates="user", cascade_delete=True)
     quiz_answers: list["QuizAnswer"] = Relationship(back_populates="user")
 
@@ -73,46 +72,6 @@ class UsersPublic(SQLModel):
     data: list[UserPublic]
     count: int
 
-
-# Shared properties
-class ItemBase(SQLModel):
-    title: str = Field(min_length=1, max_length=255)
-    description: str | None = Field(default=None, max_length=255)
-
-
-# Properties to receive on item creation
-class ItemCreate(ItemBase):
-    pass
-
-
-# Properties to receive on item update
-class ItemUpdate(ItemBase):
-    title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore[assignment]
-
-
-# Database model, database table inferred from class name
-class Item(ItemBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    created_at: datetime | None = Field(
-        default_factory=get_datetime_utc,
-        sa_type=SA_UTC_DATETIME,
-    )
-    owner_id: uuid.UUID = Field(
-        foreign_key="user.id", nullable=False, ondelete="CASCADE"
-    )
-    owner: User | None = Relationship(back_populates="items")
-
-
-# Properties to return via API, id is always required
-class ItemPublic(ItemBase):
-    id: uuid.UUID
-    owner_id: uuid.UUID
-    created_at: datetime | None = None
-
-
-class ItemsPublic(SQLModel):
-    data: list[ItemPublic]
-    count: int
 
 
 class Game(SQLModel, table=True):
@@ -159,9 +118,7 @@ class QuizQuestion(SQLModel, table=True):
     option_c: str
     option_d: str
     correct_answer: str
-    # [x] Update imports and constants in `models.py`
-    # [x] Add `games` and `quiz_answers` relationships to `User` model (keeping all existing fields)
-    # [/] Add `Game`, `QuizQuestion`, `QuizAnswer` models
+    explanation: str | None = None
     game: Game | None = Relationship(back_populates="quiz_questions")
     answers: list["QuizAnswer"] = Relationship(back_populates="question")
 
@@ -187,6 +144,7 @@ class QuizAnswer(SQLModel, table=True):
     )
     selected_option: str | None = None
     is_correct: bool | None = None
+    explanation: str | None = None
     answered_at: datetime | None = Field(
         default_factory=get_datetime_utc,
         sa_type=SA_UTC_DATETIME,
@@ -206,11 +164,6 @@ class StudentModel(SQLModel, table=True):
         ondelete="CASCADE",
         unique=True,
     )
-    madrosc: int = Field(default=0)
-    doglebne_przygotowanie: int = Field(default=0)
-    poprawnosc_wyjasnien: int = Field(default=0)
-    spojnosc: int = Field(default=0)
-    kompletnosc: int = Field(default=0)
     overall_level: int = Field(default=0)
     updated_at: datetime | None = Field(default=None, sa_type=SA_UTC_DATETIME)
     game: Game | None = Relationship(back_populates="student_model")
@@ -255,6 +208,14 @@ class TrainingMessage(SQLModel, table=True):
     session: TrainingSession | None = Relationship(back_populates="messages")
 
 
+class Boss(SQLModel, table=True):
+    __tablename__ = "bosses"  # type: ignore[assignment]
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str = Field(min_length=1, max_length=255)
+    battles: list["BossBattle"] = Relationship(back_populates="boss")
+
+
 class BossBattle(SQLModel, table=True):
     __tablename__ = "boss_battles"  # type: ignore[assignment]
 
@@ -271,6 +232,11 @@ class BossBattle(SQLModel, table=True):
         ondelete="CASCADE",
         unique=True,
     )
+    boss_id: uuid.UUID | None = Field(
+        foreign_key="bosses.id",
+        nullable=True,
+        ondelete="SET NULL",
+    )
     score: int = Field(default=0)
     max_score: int
     completed_at: datetime | None = Field(
@@ -279,6 +245,7 @@ class BossBattle(SQLModel, table=True):
     )
     game: Game | None = Relationship(back_populates="boss_battle")
     session: TrainingSession | None = Relationship(back_populates="boss_battle")
+    boss: Boss | None = Relationship(back_populates="battles")
 
 
 # Generic message
