@@ -270,6 +270,7 @@ function QuizPage() {
         <div className="flex-1 overflow-y-auto px-8 py-4">
           {q && (
             <QuestionCard
+              key={q.id}
               question={q}
               existingAnswer={quiz.answers?.[q.id] as any}
               onAnswered={(done) => {
@@ -301,7 +302,7 @@ function QuizPage() {
           ) : (
             <Button
               variant="secondary"
-              onClick={() => setCurrentQuestion((p) => Math.max(questions.length - 1, p + 1))}
+              onClick={() => setCurrentQuestion((p) => Math.min(questions.length - 1, p + 1))}
               disabled={currentQuestion === questions.length - 1}
               className="font-semibold"
             >
