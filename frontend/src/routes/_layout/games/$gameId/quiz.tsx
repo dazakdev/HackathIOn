@@ -1,12 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { CheckCircle, ChevronRight, Loader2, XCircle } from "lucide-react"
+import { CheckCircle, ChevronRight, Loader2, XCircle, BookOpen } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { GamesApi, type QuizQuestionData } from "@/lib/gameApi"
 import { useGameStore } from "@/stores/gameStore"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 
 export const Route = createFileRoute("/_layout/games/$gameId/quiz")({
   component: QuizPage,
@@ -31,37 +30,33 @@ function OptionButton({
   onClick: () => void
 }) {
   let cls =
-    "w-full text-left rounded-xl border p-3 text-sm transition-all duration-200 flex items-start gap-3 "
+    "w-full text-left rounded-xl border-2 p-4 text-base transition-all duration-200 flex items-start gap-4 "
   if (!revealed) {
     cls += selected
-      ? "border-primary bg-primary/10 ring-1 ring-primary"
+      ? "border-primary bg-primary/10 ring-2 ring-primary/20"
       : "border-border hover:border-primary/50 hover:bg-muted/50 cursor-pointer"
   } else if (correct) {
-    cls += "border-green-500 bg-green-500/10 text-green-400"
+    cls += "border-green-500 bg-green-500/10 text-green-600 dark:text-green-400 font-medium"
   } else if (selected && !correct) {
-    cls += "border-red-500 bg-red-500/10 text-red-400"
+    cls += "border-red-500 bg-red-500/10 text-red-600 dark:text-red-400 font-medium"
   } else {
     cls += "border-border opacity-50"
   }
 
   return (
     <button className={cls} onClick={revealed ? undefined : onClick} disabled={revealed}>
-      <span className="shrink-0 font-bold opacity-70">{label}.</span>
-      <span>{text}</span>
+      <span className="shrink-0 font-bold opacity-60 text-lg w-6">{label}.</span>
+      <span className="leading-relaxed">{text}</span>
     </button>
   )
 }
 
 function QuestionCard({
   question,
-  questionNumber,
-  totalQuestions,
   existingAnswer,
   onAnswered,
 }: {
   question: QuizQuestionData
-  questionNumber: number
-  totalQuestions: number
   existingAnswer?: { selected_option: string; is_correct: boolean | null }
   onAnswered: (allDone: boolean) => void
 }) {
@@ -106,15 +101,10 @@ function QuestionCard({
   const revealed = result !== null
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <span>
-          Pytanie {questionNumber}/{totalQuestions}
-        </span>
-      </div>
-      <p className="text-sm font-medium leading-relaxed">{question.question_text}</p>
+    <div className="space-y-6">
+      <h3 className="text-xl font-bold leading-relaxed">{question.question_text}</h3>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {OPTION_KEYS.map((key) => (
           <OptionButton
             key={key}
@@ -133,25 +123,25 @@ function QuestionCard({
       </div>
 
       {isPending && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" /> Sprawdzam…
+        <div className="flex items-center justify-center gap-2 text-sm text-primary py-4">
+          <Loader2 className="h-5 w-5 animate-spin" /> <span>Sprawdzam odpowiedź…</span>
         </div>
       )}
 
       {revealed && result && (
         <div
-          className={`rounded-xl p-3 text-sm ${result.is_correct ? "bg-green-500/10 border border-green-500/30 text-green-400" : "bg-red-500/10 border border-red-500/30 text-red-400"}`}
+          className={`rounded-xl p-5 border-l-4 shadow-sm animate-in fade-in slide-in-from-bottom-2 ${result.is_correct ? "bg-green-500/10 border-green-500 text-green-700 dark:text-green-300" : "bg-red-500/10 border-red-500 text-red-700 dark:text-red-300"}`}
         >
-          <div className="flex items-center gap-2 font-semibold mb-1">
+          <div className="flex items-center gap-2 font-bold text-lg mb-2">
             {result.is_correct ? (
-              <CheckCircle className="h-4 w-4" />
+              <CheckCircle className="h-6 w-6" />
             ) : (
-              <XCircle className="h-4 w-4" />
+              <XCircle className="h-6 w-6" />
             )}
-            {result.is_correct ? "Poprawnie!" : `Błędnie. Prawidłowa odpowiedź: ${result.correct_answer}`}
+            {result.is_correct ? "Poprawna odpowiedź!" : `Błędna odpowiedź. Prawidłowa to: ${result.correct_answer}`}
           </div>
           {result.explanation && (
-            <p className="text-xs opacity-80 mt-1">{result.explanation}</p>
+            <p className="text-sm opacity-90 leading-relaxed mt-2">{result.explanation}</p>
           )}
         </div>
       )}
@@ -201,7 +191,7 @@ function QuizPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh] gap-3">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="text-muted-foreground">Ładuję quiz…</span>
+        <span className="text-muted-foreground font-medium text-lg">Ładuję sesję quizu…</span>
       </div>
     )
   }
@@ -219,103 +209,101 @@ function QuizPage() {
     navigate({ to: "/games/$gameId/training", params: { gameId } })
   }
 
+  const answeredCount = Object.keys(quiz.answers ?? {}).length
+  const progressPercent = Math.round((answeredCount / questions.length) * 100)
+
   return (
-    <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-8rem)]">
-      {/* Left: Source text */}
-      <div className="lg:w-1/2 flex flex-col min-h-0">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-          Tekst źródłowy
-        </h2>
-        <div
-          ref={sourceRef}
-          onScroll={handleScroll}
-          className="flex-1 overflow-y-auto rounded-xl border bg-muted/30 p-5 text-sm leading-relaxed whitespace-pre-wrap scrollbar-thin"
-        >
-          {quiz.source_text ?? (
-            <span className="text-muted-foreground italic">
-              Wróć do głównej strony gry, aby zobaczyć tekst.
-            </span>
-          )}
+    <div className="flex flex-col lg:flex-row gap-0 h-[calc(100vh-8rem)] rounded-3xl overflow-hidden border shadow-sm bg-card">
+      {/* Left: Source text with background */}
+      <div className="lg:w-5/12 flex flex-col relative min-h-[30vh]">
+        {/* Background image for the text area */}
+        <div 
+          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-20 dark:opacity-10"
+          style={{ backgroundImage: "url('/background.jpg')" }}
+        />
+        <div className="absolute inset-0 z-0 bg-gradient-to-b from-background/80 to-background/95" />
+        
+        <div className="relative z-10 flex flex-col h-full p-8">
+          <div className="flex items-center gap-3 mb-6 opacity-80">
+            <div className="bg-primary/20 p-2 rounded-xl text-primary">
+              <BookOpen className="h-5 w-5" />
+            </div>
+            <h2 className="text-sm font-bold uppercase tracking-wider">
+              Tekst źródłowy
+            </h2>
+          </div>
+          
+          <div
+            ref={sourceRef}
+            onScroll={handleScroll}
+            className="flex-1 overflow-y-auto pr-4 text-base leading-relaxed whitespace-pre-wrap scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent text-foreground/90 font-medium"
+          >
+            {quiz.source_text ?? (
+              <span className="text-muted-foreground italic">
+                Wróć do głównej strony gry, aby zobaczyć tekst.
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Right: Quiz */}
-      <div className="lg:w-1/2 flex flex-col min-h-0">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-            Quiz — {quiz.title}
-          </h2>
-          <span className="text-xs text-muted-foreground">
-            {Object.keys(quiz.answers ?? {}).length}/{questions.length} odpowiedzi
-          </span>
+      {/* Right: Quiz Area */}
+      <div className="lg:w-7/12 flex flex-col min-h-0 bg-background relative border-l">
+        <div className="p-8 pb-4">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-xl font-black tracking-tight line-clamp-1">
+              {quiz.title}
+            </h2>
+            <div className="text-xs font-bold bg-muted px-3 py-1 rounded-full text-muted-foreground uppercase tracking-wider whitespace-nowrap">
+              Część {currentQuestion + 1} z {questions.length} / {progressPercent}%
+            </div>
+          </div>
+          
+          <div className="h-2 w-full rounded-full bg-muted mt-4 overflow-hidden">
+            <div 
+              className="h-full bg-primary transition-all duration-500 ease-out"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
         </div>
 
-        {/* Question navigation dots */}
-        <div className="flex gap-2 mb-4">
-          {questions.map((_, i) => {
-            const answerId = questions[i]?.id
-            const isAnswered = answerId && (quiz.answers?.[answerId] != null)
-            return (
-              <button
-                key={i}
-                onClick={() => setCurrentQuestion(i)}
-                className={`h-2 flex-1 rounded-full transition-all ${
-                  i === currentQuestion
-                    ? "bg-primary"
-                    : isAnswered
-                      ? "bg-green-500/60"
-                      : "bg-muted"
-                }`}
-              />
-            )
-          })}
-        </div>
-
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto px-8 py-4">
           {q && (
-            <Card>
-              <CardContent className="p-5">
-                <QuestionCard
-                  question={q}
-                  questionNumber={currentQuestion + 1}
-                  totalQuestions={questions.length}
-                  existingAnswer={
-                    quiz.answers?.[q.id] as any
-                  }
-                  onAnswered={(done) => {
-                    if (done) {
-                      setAllAnswered(true)
-                    } else if (currentQuestion < questions.length - 1) {
-                      setTimeout(() => setCurrentQuestion((p) => p + 1), 1200)
-                    }
-                  }}
-                />
-              </CardContent>
-            </Card>
+            <QuestionCard
+              question={q}
+              existingAnswer={quiz.answers?.[q.id] as any}
+              onAnswered={(done) => {
+                if (done) {
+                  setAllAnswered(true)
+                } else if (currentQuestion < questions.length - 1) {
+                  setTimeout(() => setCurrentQuestion((p) => p + 1), 1500)
+                }
+              }}
+            />
           )}
         </div>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between pt-4 mt-4 border-t">
+        {/* Navigation Footer */}
+        <div className="p-6 bg-muted/20 border-t flex items-center justify-between">
           <Button
-            variant="outline"
-            size="sm"
+            variant="ghost"
             onClick={() => setCurrentQuestion((p) => Math.max(0, p - 1))}
             disabled={currentQuestion === 0}
+            className="text-muted-foreground hover:text-foreground font-semibold"
           >
             Poprzednie
           </Button>
 
           {allAnswered ? (
-            <Button className="gap-2" onClick={goToTraining}>
-              Przejdź do treningu <ChevronRight className="h-4 w-4" />
+            <Button size="lg" className="gap-2 font-bold px-8 shadow-md" onClick={goToTraining}>
+              Przejdź do treningu <ChevronRight className="h-5 w-5" />
             </Button>
           ) : (
             <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentQuestion((p) => Math.min(questions.length - 1, p + 1))}
+              variant="secondary"
+              onClick={() => setCurrentQuestion((p) => Math.max(questions.length - 1, p + 1))}
               disabled={currentQuestion === questions.length - 1}
+              className="font-semibold"
             >
               Następne
             </Button>
