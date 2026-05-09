@@ -68,7 +68,7 @@ def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
     user = crud.create_user(session=session, user_create=user_in)
     if settings.emails_enabled and user_in.email:
         email_data = generate_new_account_email(
-            email_to=user_in.email, username=user_in.email, password=user_in.password
+            email_to=user_in.email, username=user_in.username, password=user_in.password
         )
         send_email(
             email_to=user_in.email,
@@ -107,7 +107,7 @@ def update_password_me(
     """
     Update own password.
     """
-    verified, _ = verify_password(body.current_password, current_user.hashed_password)
+    verified, _ = verify_password(body.current_password, current_user.password)
     if not verified:
         raise HTTPException(status_code=400, detail="Incorrect password")
     if body.current_password == body.new_password:
@@ -115,7 +115,7 @@ def update_password_me(
             status_code=400, detail="New password cannot be the same as the current one"
         )
     hashed_password = get_password_hash(body.new_password)
-    current_user.hashed_password = hashed_password
+    current_user.password = hashed_password
     session.add(current_user)
     session.commit()
     return Message(message="Password updated successfully")

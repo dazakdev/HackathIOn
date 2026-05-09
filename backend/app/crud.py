@@ -9,7 +9,7 @@ from app.models import Item, ItemCreate, User, UserCreate, UserUpdate
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
     db_obj = User.model_validate(
-        user_create, update={"hashed_password": get_password_hash(user_create.password)}
+        user_create, update={"password": get_password_hash(user_create.password)}
     )
     session.add(db_obj)
     session.commit()
@@ -23,7 +23,8 @@ def update_user(*, session: Session, db_user: User, user_in: UserUpdate) -> Any:
     if "password" in user_data:
         password = user_data["password"]
         hashed_password = get_password_hash(password)
-        extra_data["hashed_password"] = hashed_password
+        extra_data["password"] = hashed_password
+        user_data.pop("password")
     db_user.sqlmodel_update(user_data, update=extra_data)
     session.add(db_user)
     session.commit()
@@ -49,16 +50,15 @@ def authenticate(*, session: Session, email: str, password: str) -> User | None:
         # This ensures the response time is similar whether or not the email exists
         verify_password(password, DUMMY_HASH)
         return None
-    verified, updated_password_hash = verify_password(password, db_user.hashed_password)
+    verified, updated_password_hash = verify_password(password, db_user.password)
     if not verified:
         return None
     if updated_password_hash:
-        db_user.hashed_password = updated_password_hash
+        db_user.password = updated_password_hash
         session.add(db_user)
         session.commit()
         session.refresh(db_user)
     return db_user
-
 
 def create_item(*, session: Session, item_in: ItemCreate, owner_id: uuid.UUID) -> Item:
     db_item = Item.model_validate(item_in, update={"owner_id": owner_id})
@@ -66,3 +66,4 @@ def create_item(*, session: Session, item_in: ItemCreate, owner_id: uuid.UUID) -
     session.commit()
     session.refresh(db_item)
     return db_item
+

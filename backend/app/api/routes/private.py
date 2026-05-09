@@ -15,8 +15,8 @@ router = APIRouter(tags=["private"], prefix="/private")
 
 class PrivateUserCreate(BaseModel):
     email: str
+    username: str
     password: str
-    full_name: str
     is_verified: bool = False
 
 
@@ -28,8 +28,8 @@ def create_user(user_in: PrivateUserCreate, session: SessionDep) -> Any:
 
     user = User(
         email=user_in.email,
-        full_name=user_in.full_name,
-        hashed_password=get_password_hash(user_in.password),
+        username=user_in.username,
+        password=get_password_hash(user_in.password),
     )
 
     session.add(user)
