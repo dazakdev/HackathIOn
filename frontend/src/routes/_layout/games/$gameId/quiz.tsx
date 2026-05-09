@@ -30,7 +30,7 @@ function OptionButton({
   onClick: () => void
 }) {
   let cls =
-    "w-full text-left rounded-2xl border px-4 py-3 text-sm transition-all duration-200 flex items-start gap-3 "
+    "w-full text-left rounded-lg border px-4 py-3 text-sm transition-all duration-200 flex items-start gap-3 "
   if (!revealed) {
     cls += selected
       ? "border-primary bg-primary/10"
@@ -45,7 +45,7 @@ function OptionButton({
 
   return (
     <button className={cls} onClick={revealed ? undefined : onClick} disabled={revealed}>
-      <span className={`shrink-0 size-8 rounded-full border flex items-center justify-center text-xs font-semibold ${selected ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground"}`}>
+      <span className={`shrink-0 size-8 rounded-md border flex items-center justify-center text-xs font-semibold ${selected ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground"}`}>
         {label}
       </span>
       <span className="leading-relaxed text-sm">{text}</span>
@@ -133,7 +133,7 @@ function QuestionCard({
       )}
 
       {revealed && result && (
-        <div className="rounded-full px-4 py-2 text-xs font-semibold bg-green-500/20 text-green-700 dark:text-green-300 flex items-center gap-2">
+        <div className="rounded-md px-4 py-2 text-xs font-semibold bg-green-500/20 text-green-700 dark:text-green-300 flex items-center gap-2">
           <CheckCircle className="h-4 w-4" />
           {result.is_correct
             ? "Doskonale! To kluczowa zasada dychotomii kontroli."
@@ -220,7 +220,7 @@ function QuizPage() {
           </button>
           <div className="flex-1 flex items-center justify-center gap-4 text-xs text-muted-foreground">
             <span className="uppercase tracking-widest">Część {currentQuestion + 1} z {questions.length}</span>
-            <div className="w-40 h-1.5 rounded-full bg-muted overflow-hidden">
+            <div className="w-40 h-1.5 rounded-md bg-muted overflow-hidden">
               <div className="h-full bg-primary" style={{ width: `${progressPercent}%` }} />
             </div>
             <span className="font-semibold">{progressPercent}%</span>
@@ -231,10 +231,10 @@ function QuizPage() {
         </header>
 
         <div className="flex-1 flex items-center justify-center px-6 py-10">
-          <div className="w-full max-w-5xl grid md:grid-cols-[1.5fr_1fr] gap-0 rounded-3xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.25)]">
+          <div className="w-full max-w-5xl grid md:grid-cols-[1.5fr_1fr] gap-0 rounded-xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.25)]">
             <section className="bg-white/95 dark:bg-[#2f2f2f]/90 p-8">
               <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-6">
-                <span className="rounded-full bg-muted px-3 py-1">Filozofia</span>
+                <span className="rounded-md bg-muted px-3 py-1">Filozofia</span>
               </div>
               <h2 className="text-2xl font-semibold mb-4">{quiz.title}</h2>
               <blockquote className="border-l-2 border-border pl-4 text-sm text-muted-foreground mb-6">
@@ -256,7 +256,7 @@ function QuizPage() {
             <section className="bg-[#f4f2f5]/95 dark:bg-[#323232]/90 p-8 flex flex-col justify-between">
               <div className="space-y-6">
                 <div className="flex items-center gap-2 text-sm font-semibold">
-                  <span className="size-6 rounded-full bg-primary/20 flex items-center justify-center text-primary">?</span>
+                  <span className="size-6 rounded-md bg-primary/20 flex items-center justify-center text-primary">?</span>
                   Sprawdź wiedzę
                 </div>
                 {q && (
@@ -279,14 +279,14 @@ function QuizPage() {
                 {allAnswered ? (
                   <Button
                     size="lg"
-                    className="w-full rounded-xl font-semibold bg-white text-black hover:bg-white/90"
+                    className="w-full rounded-lg font-semibold bg-white text-black hover:bg-white/90"
                     onClick={goToTraining}
                   >
                     Przejdź do treningu <ChevronRight className="ml-2 h-4 w-4" />
                   </Button>
                 ) : (
                   <Button
-                    className="w-full rounded-xl font-semibold bg-white text-black hover:bg-white/90"
+                    className="w-full rounded-lg font-semibold bg-white text-black hover:bg-white/90"
                     onClick={() => setCurrentQuestion((p) => Math.min(questions.length - 1, p + 1))}
                     disabled={currentQuestion === questions.length - 1}
                   >

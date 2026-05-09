@@ -44,7 +44,7 @@ function NewGame() {
 
       <div className="relative z-10 flex flex-col items-center px-6 pb-16">
         <div className="w-full max-w-5xl pt-8">
-          <div className="rounded-full bg-card/90 dark:bg-black/30 border border-white/30 dark:border-white/10 px-6 py-3 flex items-center justify-between shadow-lg">
+          <div className="rounded-lg bg-card/90 dark:bg-black/30 border border-white/30 dark:border-white/10 px-6 py-3 flex items-center justify-between shadow-lg">
             <button className="flex items-center gap-2 text-sm font-medium">
               <ArrowLeft className="h-4 w-4" /> Przerwij
             </button>
@@ -61,13 +61,13 @@ function NewGame() {
         </div>
 
         <div className="w-full max-w-2xl mt-10 space-y-6">
-          <section className="rounded-2xl bg-card/90 dark:bg-[#2f2f2f]/80 border border-white/30 dark:border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.25)]">
+          <section className="rounded-lg bg-card/90 dark:bg-[#2f2f2f]/80 border border-white/30 dark:border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.25)]">
             <div className="px-6 py-4 flex items-center gap-2 text-sm font-semibold">
               <FolderOpen className="h-4 w-4" /> Materiał Źródłowy
             </div>
             <div className="px-6 pb-6">
               <textarea
-                className="w-full min-h-[160px] rounded-xl border border-border/50 bg-background/70 dark:bg-black/20 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                className="w-full min-h-[160px] rounded-lg border border-border/50 bg-background/70 dark:bg-black/20 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                 placeholder="Wklej tutaj notatki, fragment artykułu lub definicje pojęć..."
                 value={text}
                 onChange={(e) => setText(e.target.value)}
@@ -76,7 +76,7 @@ function NewGame() {
             </div>
           </section>
 
-          <section className="rounded-2xl bg-card/90 dark:bg-[#2f2f2f]/80 border border-white/30 dark:border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.25)]">
+          <section className="rounded-lg bg-card/90 dark:bg-[#2f2f2f]/80 border border-white/30 dark:border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.25)]">
             <div className="px-6 py-4 flex items-center gap-2 text-sm font-semibold">
               <BookOpen className="h-4 w-4" /> Modyfikuj przygodę
             </div>
@@ -89,7 +89,7 @@ function NewGame() {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     disabled={isPending}
-                    className="rounded-xl bg-background/70 dark:bg-black/20"
+                    className="rounded-lg bg-background/70 dark:bg-black/20"
                   />
                 </div>
                 <div className="space-y-2">
@@ -98,7 +98,7 @@ function NewGame() {
                     {["⚡", "✨", "🧠"].map((icon) => (
                       <button
                         key={icon}
-                        className={`size-9 rounded-full border text-sm ${icon === "✨" ? "bg-primary text-primary-foreground border-primary" : "bg-background/70 dark:bg-black/20 border-border"}`}
+                        className={`size-9 rounded-md border text-sm ${icon === "✨" ? "bg-primary text-primary-foreground border-primary" : "bg-background/70 dark:bg-black/20 border-border"}`}
                       >
                         {icon}
                       </button>
@@ -109,7 +109,7 @@ function NewGame() {
               <div className="space-y-2">
                 <label className="text-xs font-semibold">Opis</label>
                 <textarea
-                  className="w-full min-h-[120px] rounded-xl border border-border/50 bg-background/70 dark:bg-black/20 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                  className="w-full min-h-[120px] rounded-lg border border-border/50 bg-background/70 dark:bg-black/20 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                   placeholder="Opis przygody..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -119,7 +119,7 @@ function NewGame() {
             </div>
           </section>
 
-          <section className="rounded-2xl bg-card/90 dark:bg-[#2f2f2f]/80 border border-white/30 dark:border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.25)]">
+          <section className="rounded-lg bg-card/90 dark:bg-[#2f2f2f]/80 border border-white/30 dark:border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.25)]">
             <div className="px-6 py-4 flex items-center gap-2 text-sm font-semibold">
               <ShieldAlert className="h-4 w-4" /> Poziom Trudności
             </div>
@@ -133,14 +133,14 @@ function NewGame() {
                   key={lvl.id}
                   onClick={() => setDifficulty(lvl.id)}
                   disabled={isPending}
-                  className={`w-full text-left p-4 rounded-2xl border transition-all ${
+                  className={`w-full text-left p-4 rounded-lg border transition-all ${
                     difficulty === lvl.id
                       ? "border-primary bg-primary/10"
                       : "border-border/60 bg-background/60 dark:bg-black/20"
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`size-4 rounded-full border ${difficulty === lvl.id ? "border-primary bg-primary" : "border-muted-foreground"}`} />
+                    <div className={`size-4 rounded-md border ${difficulty === lvl.id ? "border-primary bg-primary" : "border-muted-foreground"}`} />
                     <div>
                       <div className="text-sm font-semibold">{lvl.label}</div>
                       <div className="text-xs text-muted-foreground">{lvl.desc}</div>
@@ -155,7 +155,7 @@ function NewGame() {
         <div className="mt-10">
           <Button
             size="lg"
-            className="rounded-full px-10 py-6 text-base font-semibold shadow-xl"
+            className="rounded-lg px-10 py-6 text-base font-semibold shadow-xl"
             disabled={isPending || text.trim().length < 80}
             onClick={() => mutate(text.trim())}
           >

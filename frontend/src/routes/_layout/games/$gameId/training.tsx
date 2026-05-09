@@ -42,7 +42,7 @@ function ChatMessage({
   if (isSystem) {
     return (
       <div className="flex justify-center my-4 animate-in fade-in zoom-in duration-300">
-        <div className="bg-white/10 border border-white/10 px-4 py-2 rounded-full text-xs text-white/70 max-w-[80%] text-center leading-relaxed">
+        <div className="bg-white/10 border border-white/10 px-4 py-2 rounded-md text-xs text-white/70 max-w-[80%] text-center leading-relaxed">
           {children || content}
         </div>
       </div>
@@ -51,11 +51,11 @@ function ChatMessage({
 
   return (
     <div className={`flex gap-4 my-6 w-full ${isSensai ? "flex-row-reverse" : ""}`}>
-      <div className="shrink-0 size-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
+      <div className="shrink-0 size-10 rounded-md bg-white/10 border border-white/20 flex items-center justify-center">
         {isStudent ? <Bot className="h-4 w-4 text-white/70" /> : <User className="h-4 w-4 text-white/70" />}
       </div>
       <div className={`max-w-[70%] ${isSensai ? "text-right" : "text-left"}`}>
-        <div className={`inline-block rounded-2xl px-4 py-3 text-sm shadow-lg ${isSensai ? "bg-white text-black" : "bg-black/40 text-white"}`}>
+        <div className={`inline-block rounded-lg px-4 py-3 text-sm shadow-lg ${isSensai ? "bg-white text-black" : "bg-black/40 text-white"}`}>
           {content}
           {children}
         </div>
@@ -140,14 +140,14 @@ function TrainingPage() {
   }
 
   return (
-    <div className="mx-auto max-w-[1200px] h-[calc(100vh-8rem)] rounded-3xl overflow-hidden border border-white/10 bg-[#2f2f2f] shadow-[0_30px_80px_rgba(0,0,0,0.4)] flex flex-col">
+    <div className="mx-auto max-w-[1200px] h-[calc(100vh-8rem)] rounded-xl overflow-hidden border border-white/10 bg-[#2f2f2f] shadow-[0_30px_80px_rgba(0,0,0,0.4)] flex flex-col">
       <div className="h-12 bg-[#3b3b3b] flex items-center px-6 text-xs text-white/80">
         <div className="flex items-center gap-2 font-semibold">
           <X className="h-4 w-4" /> Wprowadzenie do Stoicyzmu
         </div>
         <div className="flex-1 flex items-center justify-center gap-6">
           <span className="uppercase tracking-widest">Część {answered + 1} z {total}</span>
-          <div className="w-40 h-1.5 rounded-full bg-white/10 overflow-hidden">
+          <div className="w-40 h-1.5 rounded-md bg-white/10 overflow-hidden">
             <div className="h-full bg-white" style={{ width: total > 0 ? `${(answered / total) * 100}%` : "0%" }} />
           </div>
           <span className="font-semibold">{Math.round((answered / Math.max(total, 1)) * 100)}%</span>
@@ -159,7 +159,7 @@ function TrainingPage() {
 
       <div className="flex-1 grid md:grid-cols-[280px_1fr]">
         <aside className="border-r border-white/10 flex flex-col items-center justify-center gap-6 p-6">
-          <button className="rounded-2xl bg-white text-black px-6 py-3 text-sm font-semibold shadow-lg">
+          <button className="rounded-lg bg-white text-black px-6 py-3 text-sm font-semibold shadow-lg">
             ALE SUPER!
           </button>
           <img src="/assets/images/student.gif" alt="Uczeń" className="w-40" />
@@ -235,7 +235,7 @@ function TrainingPage() {
                 <div className="flex items-end gap-3">
                   <div className="flex-1">
                     <textarea
-                      className="w-full min-h-[60px] rounded-2xl border border-white/10 bg-[#3b3b3b] px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/40 resize-none"
+                      className="w-full min-h-[60px] rounded-lg border border-white/10 bg-[#3b3b3b] px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/40 resize-none"
                       placeholder="Wyjaśnij swojemu uczniowi..."
                       value={currentAnswer}
                       onChange={(e) => setCurrentAnswer(e.target.value)}
@@ -256,7 +256,7 @@ function TrainingPage() {
                   </div>
                   <Button
                     size="icon"
-                    className="h-11 w-11 rounded-full bg-black text-white"
+                    className="h-11 w-11 rounded-lg bg-black text-white"
                     disabled={isPending || currentAnswer.trim().length < 3}
                     onClick={() => submitAnswer(currentAnswer.trim())}
                   >

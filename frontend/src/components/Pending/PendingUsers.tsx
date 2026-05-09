@@ -31,11 +31,11 @@ const PendingUsers = () => (
             <Skeleton className="h-4 w-40" />
           </TableCell>
           <TableCell>
-            <Skeleton className="h-5 w-20 rounded-full" />
+            <Skeleton className="h-5 w-20 rounded-md" />
           </TableCell>
           <TableCell>
             <div className="flex items-center gap-2">
-              <Skeleton className="size-2 rounded-full" />
+              <Skeleton className="size-2 rounded-md" />
               <Skeleton className="h-4 w-12" />
             </div>
           </TableCell>
