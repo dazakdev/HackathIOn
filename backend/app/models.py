@@ -159,9 +159,6 @@ class QuizQuestion(SQLModel, table=True):
     option_c: str
     option_d: str
     correct_answer: str
-    # [x] Update imports and constants in `models.py`
-    # [x] Add `games` and `quiz_answers` relationships to `User` model (keeping all existing fields)
-    # [/] Add `Game`, `QuizQuestion`, `QuizAnswer` models
     game: Game | None = Relationship(back_populates="quiz_questions")
     answers: list["QuizAnswer"] = Relationship(back_populates="question")
 
@@ -206,11 +203,7 @@ class StudentModel(SQLModel, table=True):
         ondelete="CASCADE",
         unique=True,
     )
-    madrosc: int = Field(default=0)
-    doglebne_przygotowanie: int = Field(default=0)
-    poprawnosc_wyjasnien: int = Field(default=0)
-    spojnosc: int = Field(default=0)
-    kompletnosc: int = Field(default=0)
+    damage: int = Field(default=0)
     overall_level: int = Field(default=0)
     updated_at: datetime | None = Field(default=None, sa_type=SA_UTC_DATETIME)
     game: Game | None = Relationship(back_populates="student_model")
@@ -255,6 +248,17 @@ class TrainingMessage(SQLModel, table=True):
     session: TrainingSession | None = Relationship(back_populates="messages")
 
 
+class Boss(SQLModel, table=True):
+    __tablename__ = "bosses"  # type: ignore[assignment]
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str = Field(min_length=1, max_length=255)
+    hp: int = Field(default=100)
+    max_hp: int = Field(default=100)
+    damage: int = Field(default=10)
+    battles: list["BossBattle"] = Relationship(back_populates="boss")
+
+
 class BossBattle(SQLModel, table=True):
     __tablename__ = "boss_battles"  # type: ignore[assignment]
 
@@ -271,6 +275,13 @@ class BossBattle(SQLModel, table=True):
         ondelete="CASCADE",
         unique=True,
     )
+    boss_id: uuid.UUID | None = Field(
+        foreign_key="bosses.id",
+        nullable=True,
+        ondelete="SET NULL",
+    )
+    hp: int = Field(default=100)
+    max_hp: int = Field(default=100)
     score: int = Field(default=0)
     max_score: int
     completed_at: datetime | None = Field(
@@ -279,6 +290,7 @@ class BossBattle(SQLModel, table=True):
     )
     game: Game | None = Relationship(back_populates="boss_battle")
     session: TrainingSession | None = Relationship(back_populates="boss_battle")
+    boss: Boss | None = Relationship(back_populates="battles")
 
 
 # Generic message
