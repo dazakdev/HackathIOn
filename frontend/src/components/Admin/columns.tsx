@@ -54,7 +54,7 @@ export const columns: ColumnDef<UserTableData>[] = [
       <div className="flex items-center gap-2">
         <span
           className={cn(
-            "size-2 rounded-full",
+            "size-2 rounded-md",
             row.original.is_active ? "bg-green-500" : "bg-gray-400",
           )}
         />

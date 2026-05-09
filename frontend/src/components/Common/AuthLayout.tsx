@@ -11,9 +11,9 @@ export function AuthLayout({ children }: AuthLayoutProps) {
       {/* Left panel — matches dashboard dark sidebar aesthetic */}
       <div className="relative hidden overflow-hidden bg-[#0f1729] lg:flex lg:flex-col lg:justify-between">
         {/* Decorative arcs */}
-        <div className="pointer-events-none absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full border border-white/[0.06]" />
-        <div className="pointer-events-none absolute -right-24 -top-24 h-[340px] w-[340px] rounded-full border border-white/[0.04]" />
-        <div className="pointer-events-none absolute -bottom-32 -left-32 h-[400px] w-[400px] rounded-full border border-white/[0.05]" />
+        <div className="pointer-events-none absolute -right-40 -top-40 h-[500px] w-[500px] rounded-2xl border border-white/[0.06]" />
+        <div className="pointer-events-none absolute -right-24 -top-24 h-[340px] w-[340px] rounded-2xl border border-white/[0.04]" />
+        <div className="pointer-events-none absolute -bottom-32 -left-32 h-[400px] w-[400px] rounded-2xl border border-white/[0.05]" />
 
         {/* Logo */}
         <div className="relative z-10 px-8 pt-10">
@@ -35,7 +35,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         {/* Bottom ornament */}
         <div className="relative z-10 px-8 pb-8">
           <div className="flex items-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            <div className="h-1.5 w-1.5 rounded-md bg-emerald-400" />
             <span className="text-xs text-white/30">System aktywny</span>
           </div>
         </div>

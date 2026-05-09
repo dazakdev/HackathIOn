@@ -3,16 +3,12 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import {
   BookOpen,
   Plus,
-  Swords,
-  Trophy,
-  Activity,
-  Flame,
-  ArrowRight,
+  Bell,
+  User as UserIcon,
 } from "lucide-react"
-import { GamesApi, type GameSummary } from "@/lib/gameApi"
+import { GamesApi } from "@/lib/gameApi"
 import useAuth from "@/hooks/useAuth"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export const Route = createFileRoute("/_layout/")({
@@ -20,73 +16,6 @@ export const Route = createFileRoute("/_layout/")({
   head: () => ({ meta: [{ title: "Dashboard - Sensai" }] }),
 })
 
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  quiz_ready: { label: "Quiz", color: "bg-blue-500/10 text-blue-500 border border-blue-500/20" },
-  quiz_completed: { label: "Quiz ukończony", color: "bg-green-500/10 text-green-500 border border-green-500/20" },
-  training_ready: { label: "Trening", color: "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20" },
-  training_completed: { label: "Trening ukończony", color: "bg-orange-500/10 text-orange-500 border border-orange-500/20" },
-  completed: { label: "Ukończona", color: "bg-purple-500/10 text-purple-500 border border-purple-500/20" },
-}
-
-function gamePhaseRoute(game: GameSummary): string {
-  const status = game.status ?? "quiz_ready"
-  if (status === "completed") return `/games/${game.id}/summary`
-  if (status.startsWith("training")) return `/games/${game.id}/training`
-  if (status === "quiz_completed") return `/games/${game.id}/training`
-  return `/games/${game.id}/quiz`
-}
-
-function GameCard({ game }: { game: GameSummary }) {
-  const info = STATUS_LABELS[game.status ?? "quiz_ready"] ?? {
-    label: game.status ?? "Nieznany",
-    color: "bg-muted text-muted-foreground border-border",
-  }
-  const progress = game.reading_progress ?? 0
-
-  return (
-    <Card className="group hover:border-primary/50 transition-colors flex flex-col justify-between h-full bg-card shadow-sm hover:shadow-md">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-3 mb-2">
-          <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${info.color}`}>
-            {info.label}
-          </span>
-          {game.final_score != null && (
-            <span className="flex items-center text-xs font-bold text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded-full">
-              <Trophy className="h-3 w-3 mr-1" />
-              {game.final_score} XP
-            </span>
-          )}
-        </div>
-        <CardTitle className="text-lg leading-tight line-clamp-2">{game.title}</CardTitle>
-        <CardDescription className="text-xs line-clamp-2 mt-1">
-          Kliknij, aby kontynuować przygodę na etapie {info.label}.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="mt-auto space-y-4">
-        {progress > 0 && game.status !== "completed" && (
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs text-muted-foreground font-medium">
-              <span>Postęp</span>
-              <span>{Math.min(progress, 100)}%</span>
-            </div>
-            <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-              <div
-                className="h-full rounded-full bg-primary transition-all duration-500"
-                style={{ width: `${Math.min(progress, 100)}%` }}
-              />
-            </div>
-          </div>
-        )}
-        <Link to={gamePhaseRoute(game) as any} className="block mt-2">
-          <Button size="sm" className="w-full gap-2 group-hover:bg-primary/90 transition-colors">
-            {game.status === "completed" ? "Zobacz wyniki" : "Kontynuuj"}
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        </Link>
-      </CardContent>
-    </Card>
-  )
-}
 
 function Dashboard() {
   const { user } = useAuth()
@@ -96,153 +25,120 @@ function Dashboard() {
   })
 
   const active = games?.filter((g) => g.status !== "completed") ?? []
-  const finished = games?.filter((g) => g.status === "completed") ?? []
 
   return (
-    <div className="space-y-10 pb-10">
-      {/* Top Bar Stats */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight flex items-center gap-2">
-            Witaj, {user?.full_name ?? user?.email?.split('@')[0]} 👋
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm font-medium">
-            Gotowy na kolejne wyzwanie? Zobaczmy co dzisiaj osiągniesz.
-          </p>
+    <div className="mx-auto max-w-[1180px] space-y-10 pb-12">
+      <div className="flex items-center justify-end gap-3">
+        <div className="rounded-md bg-card px-4 py-2 text-sm font-semibold shadow-sm border border-border">
+          {(user?.total_points ?? 12450).toLocaleString("pl-PL")} XP
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-3 bg-muted/50 border rounded-2xl px-4 py-2">
-            <div className="flex items-center justify-center bg-yellow-500/20 text-yellow-500 rounded-full h-10 w-10">
-              <Trophy className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Twoje XP</p>
-              <p className="font-bold text-lg leading-none">{user?.total_points ?? 0}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 bg-muted/50 border rounded-2xl px-4 py-2">
-            <div className="flex items-center justify-center bg-orange-500/20 text-orange-500 rounded-full h-10 w-10">
-              <Flame className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Ranga</p>
-              <p className="font-bold text-lg leading-none">{user?.total_points && user.total_points > 1000 ? "Mistrz" : "Uczeń"}</p>
-            </div>
-          </div>
-        </div>
+        <button className="size-9 rounded-md border border-border bg-card shadow-sm flex items-center justify-center">
+          <Bell className="h-4 w-4" />
+        </button>
+        <button className="size-9 rounded-md border border-border bg-card shadow-sm flex items-center justify-center">
+          <UserIcon className="h-4 w-4" />
+        </button>
       </div>
 
-      {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-primary/5 to-background border border-primary/10 shadow-sm">
-        <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
-          <Swords className="w-64 h-64 -rotate-12" />
-        </div>
-        <div className="relative p-8 md:p-12 md:w-2/3 space-y-4">
-          <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary ring-1 ring-inset ring-primary/20">
-            Nowa Przygoda
-          </span>
-          <h2 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">
-            Rozpocznij nowy cykl nauki
-          </h2>
-          <p className="text-muted-foreground text-lg leading-relaxed max-w-xl">
-            Wklej dowolny tekst źródłowy, a my wygenerujemy dla Ciebie interaktywny quiz, sesję treningową i ekscytującą walkę z bossem wiedzy!
-          </p>
-          <div className="pt-4 flex flex-wrap gap-4">
-            <Link to="/games/new">
-              <Button size="lg" className="h-12 px-8 text-base font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all">
-                <Plus className="mr-2 h-5 w-5" /> Rozpocznij nową przygodę
-              </Button>
-            </Link>
-            <Link to="/leaderboard">
-              <Button variant="outline" size="lg" className="h-12 px-8 text-base font-bold bg-background/50 backdrop-blur-sm">
-                <Trophy className="mr-2 h-5 w-5" /> Zobacz ranking
-              </Button>
-            </Link>
+      <section className="rounded-xl border border-border bg-card shadow-[0_18px_40px_rgba(15,12,24,0.08)] relative overflow-hidden">
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 size-72 rounded-xl border border-border/60" />
+        <div className="relative p-10 space-y-6 max-w-3xl">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-semibold tracking-tight">Witaj z powrotem.</h1>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">
+              Twój umysł jest jak czysta kartka, gotowy na nową wiedzę.
+              Kontynuuj swoją podróż lub rozpocznij nową ścieżkę.
+            </p>
           </div>
-        </div>
-      </div>
 
-      {/* Stats Summary - Placeholder */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-card">
-          <CardContent className="p-6 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
-              <Activity className="h-6 w-6" />
+          <div className="flex items-center gap-10 text-sm">
+            <div className="space-y-1">
+              <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Obecna ranga</p>
+              <p className="text-lg font-semibold">Mistrz</p>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium">Aktywność z tego tygodnia</p>
-              <p className="text-2xl font-bold">Wysoka</p>
+            <div className="h-10 w-px bg-border" />
+            <div className="space-y-1">
+              <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Całkowite XP</p>
+              <p className="text-lg font-semibold">{(user?.total_points ?? 12450).toLocaleString("pl-PL")}</p>
             </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-card">
-          <CardContent className="p-6 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center text-green-500">
-              <BookOpen className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium">Przeczytane teksty</p>
-              <p className="text-2xl font-bold">{finished.length}</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-card">
-          <CardContent className="p-6 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-500">
-              <Swords className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium">Pokonani bossowie</p>
-              <p className="text-2xl font-bold">{finished.length}</p>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+
+          <Link to="/games/new">
+            <Button className="rounded-lg bg-primary px-6 py-5 text-sm font-semibold shadow-sm">
+              <Plus className="mr-2 h-4 w-4" /> Rozpocznij nową przygodę
+            </Button>
+          </Link>
+        </div>
       </section>
 
-      {/* Active games */}
-      <section>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Swords className="h-6 w-6 text-primary" /> Aktywne sesje
-          </h2>
-        </div>
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold">Twoje aktywne sesje</h2>
         {isLoading ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-48 rounded-2xl" />)}
+          <div className="grid gap-6 sm:grid-cols-2">
+            {[1, 2].map((i) => <Skeleton key={i} className="h-44 rounded-lg" />)}
           </div>
         ) : active.length === 0 ? (
-          <div className="rounded-2xl border-2 border-dashed border-muted bg-muted/10 p-12 text-center flex flex-col items-center justify-center">
-            <div className="h-16 w-16 rounded-full bg-muted/50 flex items-center justify-center mb-4 text-muted-foreground">
-              <BookOpen className="h-8 w-8" />
-            </div>
-            <h3 className="text-lg font-bold mb-1">Brak aktywnych sesji</h3>
-            <p className="text-muted-foreground max-w-sm mb-6">
-              Nie masz obecnie żadnych otwartych przygód edukacyjnych. Rozpocznij nową, aby zdobywać wiedzę i XP.
-            </p>
-            <Link to="/games/new">
-              <Button size="lg" className="font-bold shadow-sm">
-                <Plus className="mr-2 h-5 w-5" /> Nowa sesja
-              </Button>
-            </Link>
+          <div className="rounded-lg border border-dashed border-border bg-card/60 p-12 text-center">
+            <p className="text-sm text-muted-foreground">Brak aktywnych sesji.</p>
           </div>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {active.map((g) => <GameCard key={g.id} game={g} />)}
+          <div className="grid gap-6 sm:grid-cols-2">
+            {active.slice(0, 2).map((g) => (
+              <div key={g.id} className="rounded-lg border border-border bg-card shadow-[0_12px_30px_rgba(15,12,24,0.06)] p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="size-9 rounded-md bg-muted flex items-center justify-center">
+                    <BookOpen className="h-4 w-4" />
+                  </div>
+                  <span className="text-[11px] uppercase tracking-widest bg-muted px-3 py-1 rounded-md text-muted-foreground">
+                    {g.reading_progress >= 100 ? "Teaching" : "Learning"}
+                  </span>
+                </div>
+                <h3 className="text-lg font-semibold leading-snug">{g.title}</h3>
+                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                  Kontynuuj swoją przygodę edukacyjną.
+                </p>
+                <div className="mt-6 space-y-2">
+                  <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                    <span>Postęp</span>
+                    <span>{Math.min(g.reading_progress ?? 0, 100)}%</span>
+                  </div>
+                  <div className="h-2 rounded-md bg-muted overflow-hidden">
+                    <div
+                      className="h-full rounded-md bg-primary/80"
+                      style={{ width: `${Math.min(g.reading_progress ?? 0, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </section>
 
-      {/* Finished games */}
-      {finished.length > 0 && (
-        <section className="pt-4 border-t">
-          <h2 className="text-2xl font-bold tracking-tight mb-6 flex items-center gap-2 opacity-80">
-            <Trophy className="h-6 w-6 text-yellow-500" /> Ukończone
-          </h2>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 opacity-90">
-            {finished.map((g) => <GameCard key={g.id} game={g} />)}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold">Aktywność</h2>
+        <div className="rounded-lg border border-border bg-card shadow-[0_12px_30px_rgba(15,12,24,0.06)] p-6 max-w-md">
+          <div className="flex items-center justify-between text-sm font-semibold mb-4">
+            <span>Ten tydzień</span>
+            <span className="text-muted-foreground">···</span>
           </div>
-        </section>
-      )}
+          {["Pon", "Wto", "Śro", "Czw", "Pią"].map((day, idx) => (
+            <div key={day} className="mb-3">
+              <div className="text-xs text-muted-foreground mb-1">{day}</div>
+              <div className="h-2 rounded-md bg-muted overflow-hidden">
+                <div
+                  className="h-full rounded-md bg-primary/70"
+                  style={{ width: `${[75, 45, 65, 100, 20][idx]}%` }}
+                />
+              </div>
+            </div>
+          ))}
+          <div className="flex items-center justify-between mt-6 text-sm">
+            <span className="text-muted-foreground">Średnio dziennie</span>
+            <span className="font-semibold">1h 45m</span>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

@@ -43,6 +43,7 @@ export function Main({ items }: MainProps) {
                 <SidebarMenuButton
                   tooltip={item.title}
                   isActive={isActive}
+                  size="lg"
                   asChild
                 >
                   <RouterLink to={item.path} onClick={handleMenuClick}>
