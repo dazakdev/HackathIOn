@@ -184,12 +184,12 @@ class TrainingSession(SQLModel, table=True):
     )
     ended_at: datetime | None = Field(default=None, sa_type=SA_UTC_DATETIME)
     game: Game | None = Relationship(back_populates="training_sessions")
-    messages: list["TrainingMessage"] = Relationship(back_populates="session")
+    questions: list["TrainingQuestion"] = Relationship(back_populates="session")
     boss_battle: Optional["BossBattle"] = Relationship(back_populates="session")
 
 
-class TrainingMessage(SQLModel, table=True):
-    __tablename__ = "training_messages"  # type: ignore[assignment]
+class TrainingQuestion(SQLModel, table=True):
+    __tablename__ = "training_questions"  # type: ignore[assignment]
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     session_id: uuid.UUID = Field(
@@ -197,14 +197,18 @@ class TrainingMessage(SQLModel, table=True):
         nullable=False,
         ondelete="CASCADE",
     )
-    role: str
-    content: str
+    question_text: str
+    ideal_answer: str
+    user_answer: str | None = None
+    score: int | None = None
+    feedback: str | None = None
+    difficulty: str
     order_index: int
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,
         sa_type=SA_UTC_DATETIME,
     )
-    session: TrainingSession | None = Relationship(back_populates="messages")
+    session: TrainingSession | None = Relationship(back_populates="questions")
 
 
 class Boss(SQLModel, table=True):
