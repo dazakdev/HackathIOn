@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime, timezone
+from typing import List
 
 from pydantic import EmailStr
 from sqlalchemy import DateTime
@@ -63,9 +64,9 @@ class User(UserBase, table=True):
         sa_type=DateTime(timezone=True),  # type: ignore
     )
     updated_at: datetime | None = Field(default=None, sa_type=DateTime(timezone=True))
-    items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
-    games: list["Game"] = Relationship(back_populates="user", cascade_delete=True)
-    quiz_answers: list["QuizAnswer"] = Relationship(back_populates="user")
+    items: List["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+    games: List["Game"] = Relationship(back_populates="user", cascade_delete=True)
+    quiz_answers: List["QuizAnswer"] = Relationship(back_populates="user")
 
 
 # Properties to return via API, id is always required
@@ -132,10 +133,10 @@ class Game(SQLModel, table=True):
     )
     completed_at: datetime | None = Field(default=None, sa_type=DateTime(timezone=True))
     user: User | None = Relationship(back_populates="games")
-    quiz_questions: list["QuizQuestion"] = Relationship(back_populates="game")
-    quiz_answers: list["QuizAnswer"] = Relationship(back_populates="game")
+    quiz_questions: List["QuizQuestion"] = Relationship(back_populates="game")
+    quiz_answers: List["QuizAnswer"] = Relationship(back_populates="game")
     student_model: "StudentModel" | None = Relationship(back_populates="game")
-    training_sessions: list["TrainingSession"] = Relationship(back_populates="game")
+    training_sessions: List["TrainingSession"] = Relationship(back_populates="game")
     boss_battle: "BossBattle" | None = Relationship(back_populates="game")
 
 
@@ -156,7 +157,7 @@ class QuizQuestion(SQLModel, table=True):
     option_d: str
     correct_answer: str
     game: Game | None = Relationship(back_populates="quiz_questions")
-    answers: list["QuizAnswer"] = Relationship(back_populates="question")
+    answers: List["QuizAnswer"] = Relationship(back_populates="question")
 
 
 class QuizAnswer(SQLModel, table=True):
@@ -225,7 +226,7 @@ class TrainingSession(SQLModel, table=True):
     )
     ended_at: datetime | None = Field(default=None, sa_type=DateTime(timezone=True))
     game: Game | None = Relationship(back_populates="training_sessions")
-    messages: list["TrainingMessage"] = Relationship(back_populates="session")
+    messages: List["TrainingMessage"] = Relationship(back_populates="session")
     boss_battle: "BossBattle" | None = Relationship(back_populates="session")
 
 
