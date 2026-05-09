@@ -73,7 +73,6 @@ class UsersPublic(SQLModel):
     count: int
 
 
-
 class Game(SQLModel, table=True):
     __tablename__ = "games"  # type: ignore[assignment]
 
@@ -245,6 +244,7 @@ class BossBattle(SQLModel, table=True):
     )
     game: Game | None = Relationship(back_populates="boss_battle")
     session: TrainingSession | None = Relationship(back_populates="boss_battle")
+    boss: Boss | None = Relationship(back_populates="battles")
     boss: Boss | None = Relationship(back_populates="battles")
 
 
