@@ -50,6 +50,10 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str
     SENTRY_DSN: HttpUrl | None = None
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.5-flash"
+    MCQ_QUESTIONS_PER_QUIZ: int = 5
+    MCQ_MAX_REPAIR_ATTEMPTS: int = 2
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432
     POSTGRES_USER: str
