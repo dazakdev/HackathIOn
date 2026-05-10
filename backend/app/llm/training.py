@@ -130,8 +130,8 @@ def _generate_stub_training(question_count: int) -> str:
     for i in range(question_count):
         questions.append(
             {
-                "question_text": f"Przykładowe pytanie od ucznia nr {i+1} (Stub)",
-                "ideal_answer": f"To jest wzorcowa odpowiedź na pytanie nr {i+1}. (Tryb Mock)",
+                "question_text": f"Przykładowe pytanie od ucznia nr {i + 1} (Stub)",
+                "ideal_answer": f"To jest wzorcowa odpowiedź na pytanie nr {i + 1}. (Tryb Mock)",
                 "difficulty": "medium",
             }
         )
@@ -250,18 +250,24 @@ def _evaluation_prompt(
     return f"""
 Ocen odpowiedz uzytkownika jako senseia w skali 0-100.
 Oceniaj na podstawie tekstu zrodlowego oraz odpowiedzi wzorcowej.
-Nie wymagaj identycznego brzmienia. Nagradzaj poprawne wyjasnienie wlasnymi slowami.
+
+Zasady oceniania:
+- Badz SZCZODRY w wystawianiu punktow.
+- Nagradzaj zrozumienie istoty rzeczy, nawet jesli uzytkownik uzywa potocznego jezyka lub pominal detale.
+- Nie wymagaj identycznego brzmienia z odpowiedzia wzorcowa.
+- Jesli odpowiedz jest merytorycznie poprawna, celuj w zakres 85-100 punktow.
+- Jesli odpowiedz jest czesciowo poprawna, daj co najmniej 60-70 punktow.
 
 Skala:
-0-39: odpowiedz bledna albo bardzo niepelna
-40-59: czesciowo poprawna, ale brakuje waznych elementow
-60-79: zasadniczo poprawna, z brakami
-80-100: bardzo dobra, jasna i kompletna
+0-29: odpowiedz zupelnie bledna lub brak odpowiedzi
+30-59: uzytkownik cos wie, ale popelnil powazny blad merytoryczny
+60-84: dobra odpowiedz, zawiera drobne braki lub niedokladnosci
+85-100: swietna odpowiedz, uzytkownik rozumie temat
 
 Zwroc JSON:
 {{
-  "score": 82,
-  "feedback": "krotka informacja zwrotna dla uzytkownika"
+  "score": 95,
+  "feedback": "Bardzo dobre wyjasnienie! Swietnie uchwyciles sedno sprawy."
 }}
 
 TEKST ZRODLOWY:
