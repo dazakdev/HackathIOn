@@ -91,7 +91,10 @@ def simulate_boss_battle(
         )
 
     accuracy_avg = total_score / len(questions)
-    victory = boss_hp <= 0
+    victory = accuracy_avg > 75
+    
+    if victory:
+        boss_hp = 0
     
     # Get difficulty multiplier from game
     game_stmt = select(Game).where(Game.id == boss_battle.game_id)

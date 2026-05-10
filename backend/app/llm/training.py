@@ -158,7 +158,7 @@ def _system_prompt() -> str:
         "zadaje pytania tak, jak zrobilaby to prawdziwa osoba uczaca sie z tekstu, "
         "czasem myli pojecia, prosi o przyklad, dopytuje o przyczyne, skutek albo roznice "
         "miedzy podobnymi elementami. "
-        "Pytania maja pomagac sprawdzic, czy Treneiro potrafi uczyc jasno, cierpliwie i poprawnie, "
+        "Pytania maja pomagac sprawdzic, czy treneiro potrafi uczyc jasno, cierpliwie i poprawnie, "
         "a nie tylko odtworzyc definicje. "
         "Nie zdradzaj odpowiedzi w tresci pytania. "
         "Korzystaj wylacznie z informacji z tekstu zrodlowego. "
@@ -172,7 +172,7 @@ def _questions_prompt(
 ) -> str:
     difficulty_instruction = _difficulty_instruction(difficulty)
     return f"""
-Na podstawie tekstu wygeneruj dokladnie {question_count} pytan ucznia do senseia.
+Na podstawie tekstu wygeneruj dokladnie {question_count} pytan ucznia do treneiroa.
 To ma byc symulacja prawdziwej nauki, nie zwykly quiz.
 
 Uczen:
@@ -180,7 +180,7 @@ Uczen:
 - pyta naturalnie, prostym jezykiem,
 - czasem ujawnia czesciowe zrozumienie albo typowe nieporozumienie,
 - prosi o wyjasnienie zaleznosci, przykladu, sensu albo konsekwencji,
-- zadaje pytania, na ktore dobry sensei powinien odpowiedziec jasno i dydaktycznie.
+- zadaje pytania, na ktore dobry treneiro powinien odpowiedziec jasno i dydaktycznie.
 
 Ustawienie trudnosci:
 {difficulty_instruction}
@@ -189,9 +189,9 @@ Kazde pytanie musi:
 - wynikac bezposrednio z tekstu,
 - byc sformulowane z perspektywy ucznia,
 - nie zawierac gotowej odpowiedzi,
-- sprawdzac, czy sensei umie wytlumaczyc temat drugiej osobie.
+- sprawdzac, czy treneiro umie wytlumaczyc temat drugiej osobie.
 
-Do kazdego pytania dodaj ideal_answer: wzorowa odpowiedz senseia.
+Do kazdego pytania dodaj ideal_answer: wzorowa odpowiedz treneiroa.
 Idealna odpowiedz powinna:
 - byc poprawna na podstawie tekstu,
 - byc krotka, ale dydaktyczna,
@@ -207,7 +207,7 @@ Zwroc JSON:
   "questions": [
     {{
       "question_text": "pytanie ucznia",
-      "ideal_answer": "wzorowa odpowiedz senseia",
+      "ideal_answer": "wzorowa odpowiedz treneiroa",
       "difficulty": "medium"
     }}
   ]
@@ -248,7 +248,7 @@ def _evaluation_prompt(
     user_answer: str,
 ) -> str:
     return f"""
-Ocen odpowiedz uzytkownika jako senseia w skali 0-100.
+Ocen odpowiedz uzytkownika jako treneiroa w skali 0-100.
 Oceniaj na podstawie tekstu zrodlowego oraz odpowiedzi wzorcowej.
 
 Zasady oceniania:

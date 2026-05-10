@@ -7,13 +7,13 @@ from pathlib import Path
 
 from app.llm.training import (
     TrainingDifficulty,
-    evaluate_sensei_answer,
+    evaluate_treneiro_answer,
     generate_student_questions,
 )
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Test Sensai training generation.")
+    parser = argparse.ArgumentParser(description="Test Treneiro training generation.")
     parser.add_argument("file", type=Path, help="Path to a UTF-8 text file.")
     parser.add_argument(
         "--questions",
@@ -24,7 +24,7 @@ def main() -> None:
     parser.add_argument(
         "--answer",
         default=None,
-        help="Optional sensei answer to evaluate against the first generated question.",
+        help="Optional treneiro answer to evaluate against the first generated question.",
     )
     parser.add_argument(
         "--difficulty",
@@ -45,7 +45,7 @@ def main() -> None:
 
     if args.answer:
         first_question = question_set.questions[0]
-        evaluation = evaluate_sensei_answer(
+        evaluation = evaluate_treneiro_answer(
             source_text=text,
             question_text=first_question.question_text,
             ideal_answer=first_question.ideal_answer,
