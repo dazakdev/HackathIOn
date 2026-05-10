@@ -136,24 +136,9 @@ function Dashboard() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-4">
             {active.map((g) => {
-              const localProgress = localStorage.getItem(
-                `training_progress_${g.id}`,
-              )
-              let trainingInfo = null
-              if (localProgress) {
-                try {
-                  const parsed = JSON.parse(localProgress)
-                  if (typeof parsed === "object") {
-                    trainingInfo = parsed
-                  } else {
-                    // Handle old format (plain number)
-                    trainingInfo = { answered: 0, total: 3 }
-                  }
-                } catch {
-                  trainingInfo = { answered: 0, total: 3 }
-                }
-              }
-              const isTraining = g.reading_progress >= 100
+              const isTraining = g.status === "training_ready"
+              const trainingInfo = g.training_progress
+              const quizInfo = g.quiz_progress
 
               return (
                 <Link
@@ -188,9 +173,11 @@ function Dashboard() {
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                       {isTraining
                         ? "Podczas trenowania ucznia"
-                        : g.reading_progress === 0
-                          ? "Uczeń gotowy do nauki"
-                          : "Kontynuuj swoją przygodę edukacyjną."}
+                        : quizInfo && quizInfo.answered > 0
+                          ? "W trakcie rozwiązywania quizu"
+                          : g.reading_progress === 0
+                            ? "Uczeń gotowy do nauki"
+                            : "Kontynuuj swoją przygodę edukacyjną."}
                     </p>
                     <div className="mt-6 space-y-2">
                       <div className="flex items-center justify-between text-[11px] text-muted-foreground font-bold">
@@ -199,16 +186,20 @@ function Dashboard() {
                             ? trainingInfo
                               ? `Pytania: ${trainingInfo.answered}/${trainingInfo.total}`
                               : "Trening w toku"
-                            : g.reading_progress === 0
-                              ? "Gotowy do nauki"
-                              : "Postęp"}
+                            : quizInfo && quizInfo.answered > 0
+                              ? `Quiz: ${quizInfo.answered}/${quizInfo.total}`
+                              : g.reading_progress === 0
+                                ? "Gotowy do nauki"
+                                : "Postęp"}
                         </span>
-                        <span className={isTraining ? "text-primary" : ""}>
+                        <span className={(isTraining || (quizInfo && quizInfo.answered > 0)) ? "text-primary" : ""}>
                           {isTraining
                             ? trainingInfo
                               ? `${Math.round((trainingInfo.answered / trainingInfo.total) * 100)}%`
                               : "0%"
-                            : `${Math.min(g.reading_progress ?? 0, 100)}%`}
+                            : quizInfo && quizInfo.answered > 0
+                              ? `${Math.round((quizInfo.answered / quizInfo.total) * 100)}%`
+                              : `${Math.min(g.reading_progress ?? 0, 100)}%`}
                         </span>
                       </div>
                       <div className="h-2 rounded-md bg-muted overflow-hidden">
@@ -219,7 +210,9 @@ function Dashboard() {
                               ? trainingInfo
                                 ? `${(trainingInfo.answered / trainingInfo.total) * 100}%`
                                 : "0%"
-                              : `${Math.min(g.reading_progress ?? 0, 100)}%`,
+                              : quizInfo && quizInfo.answered > 0
+                                ? `${(quizInfo.answered / quizInfo.total) * 100}%`
+                                : `${Math.min(g.reading_progress ?? 0, 100)}%`,
                           }}
                         />
                       </div>

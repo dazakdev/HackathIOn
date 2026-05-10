@@ -22,6 +22,8 @@ export interface GameSummary {
   final_score: number | null
   created_at: string
   completed_at: string | null
+  training_progress?: { answered: number; total: number } | null
+  quiz_progress?: { answered: number; total: number } | null
 }
 
 export interface GameDetail extends GameSummary {

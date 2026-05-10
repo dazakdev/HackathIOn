@@ -7,6 +7,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 from sqlmodel import col, func, select
+from sqlalchemy.orm import selectinload
 
 from app.api.deps import CurrentUser, SessionDep
 from app.core.config import settings
@@ -58,6 +59,23 @@ class TrainingAnswerRequest(BaseModel):
 # ─── Response helpers ────────────────────────────────────────────────────────
 
 def _game_dict(game: Game) -> dict[str, Any]:
+    training_progress = None
+    if game.status == "training_ready":
+        # Find the active session (one where ended_at is None)
+        active_sessions = [s for s in game.training_sessions if s.ended_at is None]
+        if active_sessions:
+            session = active_sessions[0]
+            answered = len([q for q in session.questions if q.score is not None])
+            total = len(session.questions)
+            training_progress = {"answered": answered, "total": total}
+
+    quiz_progress = None
+    if game.quiz_questions:
+        total = len(game.quiz_questions)
+        # Assuming quiz_answers relationship contains current user's answers for this game
+        answered = len(game.quiz_answers)
+        quiz_progress = {"answered": answered, "total": total}
+
     return {
         "id": str(game.id),
         "title": game.title,
@@ -67,6 +85,8 @@ def _game_dict(game: Game) -> dict[str, Any]:
         "icon": game.icon,
         "reading_progress": game.reading_progress,
         "final_score": game.final_score,
+        "training_progress": training_progress,
+        "quiz_progress": quiz_progress,
         "created_at": game.created_at,
         "completed_at": game.completed_at,
     }
@@ -167,6 +187,11 @@ def list_games(session: SessionDep, current_user: CurrentUser) -> list[dict[str,
     stmt = (
         select(Game)
         .where(Game.user_id == current_user.id)
+        .options(
+            selectinload(Game.training_sessions).selectinload(TrainingSession.questions),
+            selectinload(Game.quiz_questions),
+            selectinload(Game.quiz_answers),
+        )
         .order_by(col(Game.created_at).desc())
     )
     games = session.exec(stmt).all()
