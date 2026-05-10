@@ -153,6 +153,7 @@ function QuizPage() {
 
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [allAnswered, setAllAnswered] = useState(false)
+  const [currentAnswered, setCurrentAnswered] = useState(false)
   const sourceRef = useRef<HTMLDivElement>(null)
   const saveProgressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -168,6 +169,12 @@ function QuizPage() {
     setAllAnswered(allDone)
     if (allDone) setCurrentQuestion((quiz.questions?.length ?? 1) - 1)
   }, [quiz])
+
+  useEffect(() => {
+    if (!quiz) return
+    const q = quiz.questions?.[currentQuestion]
+    setCurrentAnswered(!!q && !!quiz.answers?.[q.id])
+  }, [currentQuestion, quiz])
 
   const handleScroll = useCallback(() => {
     const el = sourceRef.current
@@ -265,11 +272,8 @@ function QuizPage() {
                     question={q}
                     existingAnswer={quiz.answers?.[q.id] as any}
                     onAnswered={(done) => {
-                      if (done) {
-                        setAllAnswered(true)
-                      } else if (currentQuestion < questions.length - 1) {
-                        setTimeout(() => setCurrentQuestion((p) => p + 1), 1500)
-                      }
+                      setCurrentAnswered(true)
+                      if (done) setAllAnswered(true)
                     }}
                   />
                 )}
@@ -286,9 +290,9 @@ function QuizPage() {
                   </Button>
                 ) : (
                   <Button
-                    className="w-full rounded-lg font-semibold bg-white text-black hover:bg-white/90"
+                    className="w-full rounded-lg font-semibold bg-white text-black hover:bg-white/90 disabled:opacity-40"
                     onClick={() => setCurrentQuestion((p) => Math.min(questions.length - 1, p + 1))}
-                    disabled={currentQuestion === questions.length - 1}
+                    disabled={!currentAnswered || currentQuestion === questions.length - 1}
                   >
                     Następna część
                   </Button>

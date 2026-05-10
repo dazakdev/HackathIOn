@@ -116,8 +116,8 @@ export interface LeaderboardEntry {
 // ── API calls ──────────────────────────────────────────────────────────────
 
 export const GamesApi = {
-  createGame: (source_text: string) =>
-    api.post<GameDetail & { questions: QuizQuestionData[] }>("/games/", { source_text }).then((r) => r.data),
+  createGame: (source_text: string, title?: string, description?: string) =>
+    api.post<GameDetail & { questions: QuizQuestionData[] }>("/games/", { source_text, title: title || undefined, description: description || undefined }).then((r) => r.data),
 
   listGames: () =>
     api.get<GameSummary[]>("/games/").then((r) => r.data),

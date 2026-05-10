@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { ArrowLeft, BookOpen, FolderOpen, ShieldAlert, Zap, Loader2 } from "lucide-react"
-import { useState } from "react"
+import { ArrowLeft, BookOpen, FolderOpen, ShieldAlert, Zap, Loader2, Sparkles, Brain } from "lucide-react"
+import { useState, type ComponentType } from "react"
 import { toast } from "sonner"
 import { GamesApi } from "@/lib/gameApi"
 import { useGameStore } from "@/stores/gameStore"
@@ -23,11 +23,16 @@ function NewGame() {
   const [description, setDescription] = useState("")
   const [text, setText] = useState("")
   const [difficulty, setDifficulty] = useState("easy")
+  const [selectedIcon, setSelectedIcon] = useState("zap")
+
+  const ICONS: { key: string; Icon: ComponentType<{ className?: string }> }[] = [
+    { key: "zap", Icon: Zap },
+    { key: "sparkles", Icon: Sparkles },
+    { key: "brain", Icon: Brain },
+  ]
 
   const { mutate, isPending } = useMutation({
-    mutationFn: (source_text: string) => GamesApi.createGame(source_text),
-    // Note: The backend currently only accepts source_text, but we keep the other
-    // state (title, difficulty) locally ready for when the API is updated.
+    mutationFn: () => GamesApi.createGame(text.trim(), title.trim() || undefined, description.trim() || undefined),
     onSuccess: (data) => {
       setGame(data.id, "quiz")
       toast.success("Gra utworzona! Quiz gotowy.")
@@ -45,7 +50,10 @@ function NewGame() {
       <div className="relative z-10 flex flex-col items-center px-6 pb-16">
         <div className="w-full max-w-5xl pt-8">
           <div className="rounded-lg bg-card/90 dark:bg-black/30 border border-white/30 dark:border-white/10 px-6 py-3 flex items-center justify-between shadow-lg">
-            <button className="flex items-center gap-2 text-sm font-medium">
+            <button
+              className="flex items-center gap-2 text-sm font-medium"
+              onClick={() => navigate({ to: "/" })}
+            >
               <ArrowLeft className="h-4 w-4" /> Przerwij
             </button>
             <Logo variant="icon" className="h-6 w-auto" asLink={false} />
@@ -94,13 +102,20 @@ function NewGame() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-semibold">Ikona</label>
-                  <div className="flex items-center gap-3">
-                    {["⚡", "✨", "🧠"].map((icon) => (
+                  <div className="flex items-center gap-2">
+                    {ICONS.map(({ key, Icon }) => (
                       <button
-                        key={icon}
-                        className={`size-9 rounded-md border text-sm ${icon === "✨" ? "bg-primary text-primary-foreground border-primary" : "bg-background/70 dark:bg-black/20 border-border"}`}
+                        key={key}
+                        type="button"
+                        onClick={() => setSelectedIcon(key)}
+                        disabled={isPending}
+                        className={`size-10 rounded-md border flex items-center justify-center transition-colors ${
+                          selectedIcon === key
+                            ? "bg-foreground text-background border-foreground"
+                            : "bg-background/70 dark:bg-black/20 border-border text-foreground hover:border-foreground/50"
+                        }`}
                       >
-                        {icon}
+                        <Icon className="h-4 w-4" />
                       </button>
                     ))}
                   </div>
@@ -157,7 +172,7 @@ function NewGame() {
             size="lg"
             className="rounded-lg px-10 py-6 text-base font-semibold shadow-xl"
             disabled={isPending || text.trim().length < 80}
-            onClick={() => mutate(text.trim())}
+            onClick={() => mutate()}
           >
             {isPending ? (
               <>

@@ -35,6 +35,8 @@ router = APIRouter(tags=["games"])
 
 class GameCreateRequest(BaseModel):
     source_text: str
+    title: str | None = None
+    description: str | None = None
 
 
 class ProgressUpdateRequest(BaseModel):
@@ -145,6 +147,8 @@ def create_game(
         session=session,
         user_id=current_user.id,
         text=body.source_text,
+        title=body.title or None,
+        description=body.description or None,
     )
     result = _game_detail_dict(game)
     result["questions"] = [_question_dict(q) for q in questions]

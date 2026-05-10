@@ -1,24 +1,36 @@
 import { useQuery } from "@tanstack/react-query"
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import {
   BookOpen,
   Plus,
   Bell,
   User as UserIcon,
+  Sun,
+  Moon,
 } from "lucide-react"
-import { GamesApi } from "@/lib/gameApi"
+import { toast } from "sonner"
+import { GamesApi, type GameSummary } from "@/lib/gameApi"
 import useAuth from "@/hooks/useAuth"
+import { useTheme } from "@/components/theme-provider"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+
+function gameRoute(g: GameSummary) {
+  if (g.status === "quiz_completed") return { to: "/games/$gameId/training" as const, params: { gameId: g.id } }
+  if (g.status === "training_completed") return { to: "/games/$gameId/boss" as const, params: { gameId: g.id } }
+  return { to: "/games/$gameId/quiz" as const, params: { gameId: g.id } }
+}
 
 export const Route = createFileRoute("/_layout/")({
   component: Dashboard,
   head: () => ({ meta: [{ title: "Dashboard - Sensai" }] }),
 })
 
-
 function Dashboard() {
   const { user } = useAuth()
+  const navigate = useNavigate()
+  const { resolvedTheme, setTheme } = useTheme()
+
   const { data: games, isLoading } = useQuery({
     queryKey: ["games"],
     queryFn: GamesApi.listGames,
@@ -26,16 +38,31 @@ function Dashboard() {
 
   const active = games?.filter((g) => g.status !== "completed") ?? []
 
+  const toggleTheme = () => setTheme(resolvedTheme === "dark" ? "light" : "dark")
+
   return (
     <div className="mx-auto max-w-[1180px] space-y-10 pb-12">
       <div className="flex items-center justify-end gap-3">
         <div className="rounded-md bg-card px-4 py-2 text-sm font-semibold shadow-sm border border-border">
-          {(user?.total_points ?? 12450).toLocaleString("pl-PL")} XP
+          {user ? user.total_points.toLocaleString("pl-PL") : "—"} XP
         </div>
-        <button className="size-9 rounded-md border border-border bg-card shadow-sm flex items-center justify-center">
+        <button
+          onClick={toggleTheme}
+          className="size-9 rounded-md border border-border bg-card shadow-sm flex items-center justify-center hover:bg-muted transition-colors"
+          title={resolvedTheme === "dark" ? "Tryb jasny" : "Tryb ciemny"}
+        >
+          {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </button>
+        <button
+          onClick={() => toast.info("Brak nowych powiadomień.")}
+          className="size-9 rounded-md border border-border bg-card shadow-sm flex items-center justify-center hover:bg-muted transition-colors"
+        >
           <Bell className="h-4 w-4" />
         </button>
-        <button className="size-9 rounded-md border border-border bg-card shadow-sm flex items-center justify-center">
+        <button
+          onClick={() => navigate({ to: "/settings" })}
+          className="size-9 rounded-md border border-border bg-card shadow-sm flex items-center justify-center hover:bg-muted transition-colors"
+        >
           <UserIcon className="h-4 w-4" />
         </button>
       </div>
@@ -59,7 +86,7 @@ function Dashboard() {
             <div className="h-10 w-px bg-border" />
             <div className="space-y-1">
               <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Całkowite XP</p>
-              <p className="text-lg font-semibold">{(user?.total_points ?? 12450).toLocaleString("pl-PL")}</p>
+              <p className="text-lg font-semibold">{user ? user.total_points.toLocaleString("pl-PL") : "—"}</p>
             </div>
           </div>
 
@@ -84,7 +111,11 @@ function Dashboard() {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2">
             {active.slice(0, 2).map((g) => (
-              <div key={g.id} className="rounded-lg border border-border bg-card shadow-[0_12px_30px_rgba(15,12,24,0.06)] p-6">
+              <Link
+                key={g.id}
+                {...gameRoute(g)}
+                className="rounded-lg border border-border bg-card shadow-[0_12px_30px_rgba(15,12,24,0.06)] p-6 block hover:border-primary/50 hover:shadow-[0_12px_30px_rgba(15,12,24,0.12)] transition-all cursor-pointer"
+              >
                 <div className="flex items-center justify-between mb-4">
                   <div className="size-9 rounded-md bg-muted flex items-center justify-center">
                     <BookOpen className="h-4 w-4" />
@@ -109,35 +140,10 @@ function Dashboard() {
                     />
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold">Aktywność</h2>
-        <div className="rounded-lg border border-border bg-card shadow-[0_12px_30px_rgba(15,12,24,0.06)] p-6 max-w-md">
-          <div className="flex items-center justify-between text-sm font-semibold mb-4">
-            <span>Ten tydzień</span>
-            <span className="text-muted-foreground">···</span>
-          </div>
-          {["Pon", "Wto", "Śro", "Czw", "Pią"].map((day, idx) => (
-            <div key={day} className="mb-3">
-              <div className="text-xs text-muted-foreground mb-1">{day}</div>
-              <div className="h-2 rounded-md bg-muted overflow-hidden">
-                <div
-                  className="h-full rounded-md bg-primary/70"
-                  style={{ width: `${[75, 45, 65, 100, 20][idx]}%` }}
-                />
-              </div>
-            </div>
-          ))}
-          <div className="flex items-center justify-between mt-6 text-sm">
-            <span className="text-muted-foreground">Średnio dziennie</span>
-            <span className="font-semibold">1h 45m</span>
-          </div>
-        </div>
       </section>
     </div>
   )

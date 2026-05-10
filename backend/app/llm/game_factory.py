@@ -14,11 +14,14 @@ def create_game_with_mcq(
     user_id: uuid.UUID,
     text: str,
     question_count: int | None = None,
+    title: str | None = None,
+    description: str | None = None,
 ) -> tuple[Game, list[QuizQuestion]]:
     quiz = generate_mcq_quiz(text, question_count=question_count)
     game = Game(
         user_id=user_id,
-        title=quiz.title,
+        title=title or quiz.title,
+        description=description,
         source_text=text,
         reading_progress=0,
         status="quiz_ready",
