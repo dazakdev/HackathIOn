@@ -44,7 +44,7 @@ class TreneiroAnswerEvaluation(BaseModel):
 
 def generate_student_questions(
     source_text: str,
-    question_count: int = 5,
+    question_count: int = 3,
     difficulty: TrainingDifficulty = "mixed",
 ) -> GeneratedTrainingQuestions:
     text = _normalize_source_text(source_text)
@@ -100,7 +100,7 @@ def _generate_content(
     *,
     prompt: str,
     response_schema: type[BaseModel],
-    question_count: int = 5,
+    question_count: int = 3,
 ) -> str:
     if not settings.GEMINI_API_KEY:
         if response_schema == GeneratedTrainingQuestions:

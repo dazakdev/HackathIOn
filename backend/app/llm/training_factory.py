@@ -20,7 +20,7 @@ def create_training_session_with_questions(
     *,
     session: Session,
     game: Game,
-    question_count: int = 5,
+    question_count: int = 3,
     difficulty: TrainingDifficulty = "mixed",
 ) -> tuple[TrainingSession, list[TrainingQuestion]]:
     question_set = generate_student_questions(

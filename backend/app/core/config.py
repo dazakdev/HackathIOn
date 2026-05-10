@@ -53,6 +53,7 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     GEMINI_MODEL: str = "gemini-3.1-flash-lite"
     MCQ_QUESTIONS_PER_QUIZ: int = 5
+    TRAINING_QUESTIONS_PER_SESSION: int = 3
     MCQ_MAX_REPAIR_ATTEMPTS: int = 2
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432

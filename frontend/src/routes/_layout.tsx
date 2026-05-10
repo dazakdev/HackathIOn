@@ -32,7 +32,7 @@ function Layout() {
 
   if (isFullScreen) {
     return (
-      <main className="min-h-svh bg-background">
+      <main className="min-h-svh bg-background overflow-x-hidden">
         <Outlet />
       </main>
     )
@@ -41,10 +41,10 @@ function Layout() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="bg-background min-h-svh">
-        <main className="flex-1 px-10 py-8">
+      <SidebarInset className="bg-background min-h-svh overflow-x-hidden">
+        <div className="flex-1 px-10 py-8">
           <Outlet />
-        </main>
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )

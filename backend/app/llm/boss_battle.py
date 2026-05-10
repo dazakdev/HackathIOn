@@ -91,16 +91,22 @@ def simulate_boss_battle(
         )
 
     accuracy_avg = total_score / len(questions)
-    victory = accuracy_avg > 75
-    
-    if victory:
-        boss_hp = 0
-    
-    # Get difficulty multiplier from game
+
+    # Get difficulty from game
     game_stmt = select(Game).where(Game.id == boss_battle.game_id)
     game = session.exec(game_stmt).first()
-    multiplier = DIFFICULTY_MULTIPLIER.get(game.difficulty if game else "medium", 1.0)
-    
+    difficulty = game.difficulty if game else "medium"
+
+    threshold = 75
+    if difficulty == "easy":
+        threshold = 30
+
+    victory = accuracy_avg >= threshold
+
+    if victory:
+        boss_hp = 0
+
+    multiplier = DIFFICULTY_MULTIPLIER.get(difficulty, 1.0)
     xp_gained = int(accuracy_avg * multiplier * 10)
 
     boss_battle.boss_hp_end = boss_hp

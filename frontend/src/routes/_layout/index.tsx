@@ -122,9 +122,9 @@ function Dashboard() {
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">Twoje aktywne sesje</h2>
         {isLoading ? (
-          <div className="flex gap-6 overflow-x-auto py-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-4">
             {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-44 min-w-[320px] rounded-lg" />
+              <Skeleton key={i} className="h-56 rounded-lg" />
             ))}
           </div>
         ) : active.length === 0 ? (
@@ -134,7 +134,7 @@ function Dashboard() {
             </p>
           </div>
         ) : (
-          <div className="flex gap-6 overflow-x-auto py-4 -mx-1 px-1 snap-x">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-4">
             {active.map((g) => {
               const localProgress = localStorage.getItem(
                 `training_progress_${g.id}`,
@@ -153,7 +153,7 @@ function Dashboard() {
                       : "/games/$gameId/quiz"
                   }
                   params={{ gameId: g.id }}
-                  className="min-w-[320px] max-w-[320px] snap-start group"
+                  className="group animate-in fade-in slide-in-from-bottom-4 duration-500"
                 >
                   <div className="h-full rounded-lg border border-border bg-card shadow-lg p-6 transition-all duration-200 group-hover:shadow-lg group-hover:border-primary/40 group-hover:-translate-y-1">
                     <div className="flex items-center justify-between mb-4">
@@ -224,13 +224,13 @@ function Dashboard() {
       {completed.length > 0 && (
         <section className="space-y-4">
           <h2 className="text-lg font-semibold">Ukończone przygody</h2>
-          <div className="flex gap-6 overflow-x-auto py-4 -mx-1 px-1 snap-x">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-4">
             {completed.map((g) => (
               <Link
                 key={g.id}
                 to="/games/$gameId/summary"
                 params={{ gameId: g.id }}
-                className="min-w-[320px] max-w-[320px] snap-start group"
+                className="group animate-in fade-in slide-in-from-bottom-4 duration-500"
               >
                 <div className="h-full rounded-lg border border-border bg-card/40 shadow-sm p-6 transition-all duration-200 group-hover:shadow-md group-hover:border-primary/20 group-hover:-translate-y-1">
                   <div className="flex items-center justify-between mb-4">

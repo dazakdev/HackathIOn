@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from sqlmodel import col, func, select
 
 from app.api.deps import CurrentUser, SessionDep
+from app.core.config import settings
 from app.llm.boss_battle import BossSimulationResult, calculate_boss_hp, simulate_boss_battle
 from app.llm.game_factory import create_game_with_mcq
 from app.llm.training_factory import (
@@ -424,7 +425,7 @@ def start_training(
     training_session, questions = create_training_session_with_questions(
         session=session,
         game=game,
-        question_count=5,
+        question_count=settings.TRAINING_QUESTIONS_PER_SESSION,
         difficulty="mixed",
     )
     return {
