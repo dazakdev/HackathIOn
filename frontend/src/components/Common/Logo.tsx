@@ -32,6 +32,7 @@ export function Logo({
           alt="Treneiro"
           className={cn(
             "h-10 w-auto group-data-[collapsible=icon]:hidden",
+            isDark && "brightness-0 invert",
             className,
           )}
         />
@@ -40,6 +41,7 @@ export function Logo({
           alt="Treneiro"
           className={cn(
             "size-8 hidden group-data-[collapsible=icon]:block",
+            isDark && "brightness-0 invert",
             className,
           )}
         />
@@ -48,7 +50,11 @@ export function Logo({
       <img
         src={variant === "full" ? fullLogo : iconLogo}
         alt="Treneiro"
-        className={cn(variant === "full" ? "h-10 w-auto" : "size-8", className)}
+        className={cn(
+          variant === "full" ? "h-10 w-auto" : "size-8",
+          isDark && "brightness-0 invert",
+          className
+        )}
       />
     )
 

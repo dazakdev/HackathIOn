@@ -6,6 +6,7 @@ import {
   LogOut,
   Sun,
   Moon,
+  Award,
 } from "lucide-react"
 import { GamesApi } from "@/lib/gameApi"
 import useAuth from "@/hooks/useAuth"
@@ -28,6 +29,7 @@ function Dashboard() {
   })
 
   const active = games?.filter((g) => g.status !== "completed") ?? []
+  const completed = games?.filter((g) => g.status === "completed") ?? []
 
   const toggleTheme = () => {
     setTheme(resolvedTheme === "dark" ? "light" : "dark")
@@ -56,7 +58,6 @@ function Dashboard() {
       </div>
 
       <section className="rounded-xl border border-border bg-card shadow-[0_18px_40px_rgba(15,12,24,0.08)] relative overflow-hidden">
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 size-72 rounded-xl border border-border/60" />
         <div className="relative p-10 space-y-6 max-w-3xl">
           <div className="space-y-2">
             <h1 className="text-3xl font-semibold tracking-tight">Witaj z powrotem.</h1>
@@ -89,7 +90,7 @@ function Dashboard() {
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">Twoje aktywne sesje</h2>
         {isLoading ? (
-          <div className="flex gap-6 overflow-x-auto pb-4">
+          <div className="flex gap-6 overflow-x-auto py-4">
             {[1, 2, 3].map((i) => <Skeleton key={i} className="h-44 min-w-[320px] rounded-lg" />)}
           </div>
         ) : active.length === 0 ? (
@@ -97,7 +98,7 @@ function Dashboard() {
             <p className="text-sm text-muted-foreground">Brak aktywnych sesji.</p>
           </div>
         ) : (
-          <div className="flex gap-6 overflow-x-auto pb-6 -mx-1 px-1 snap-x">
+          <div className="flex gap-6 overflow-x-auto py-4 -mx-1 px-1 snap-x">
             {active.map((g) => (
               <Link
                 key={g.id}
@@ -105,7 +106,7 @@ function Dashboard() {
                 params={{ gameId: g.id }}
                 className="min-w-[320px] max-w-[320px] snap-start group"
               >
-                <div className="h-full rounded-lg border border-border bg-card shadow-[0_12px_30px_rgba(15,12,24,0.06)] p-6 transition-all duration-200 group-hover:shadow-lg group-hover:border-primary/40 group-hover:-translate-y-1">
+                <div className="h-full rounded-lg border border-border bg-card shadow-lg p-6 transition-all duration-200 group-hover:shadow-lg group-hover:border-primary/40 group-hover:-translate-y-1">
                   <div className="flex items-center justify-between mb-4">
                     <div className="size-9 rounded-md bg-muted flex items-center justify-center transition-colors group-hover:bg-primary/10">
                       <BookOpen className="h-4 w-4 transition-colors group-hover:text-primary" />
@@ -136,6 +137,41 @@ function Dashboard() {
           </div>
         )}
       </section>
+
+      {completed.length > 0 && (
+        <section className="space-y-4">
+          <h2 className="text-lg font-semibold">Ukończone przygody</h2>
+          <div className="flex gap-6 overflow-x-auto py-4 -mx-1 px-1 snap-x">
+            {completed.map((g) => (
+              <Link
+                key={g.id}
+                to="/games/$gameId/summary"
+                params={{ gameId: g.id }}
+                className="min-w-[320px] max-w-[320px] snap-start group"
+              >
+                <div className="h-full rounded-lg border border-border bg-card/40 shadow-sm p-6 transition-all duration-200 group-hover:shadow-md group-hover:border-primary/20 group-hover:-translate-y-1">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="size-9 rounded-md bg-primary/10 flex items-center justify-center text-primary">
+                      <Award className="h-4 w-4" />
+                    </div>
+                    <span className="text-[10px] uppercase tracking-widest bg-green-500/5 px-2.5 py-1 rounded-md text-green-500/70 font-medium border border-green-500/10">
+                      Ukończono
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-1">{g.title}</h3>
+                  <p className="text-[11px] text-muted-foreground mt-1">
+                    Przygoda zakończona sukcesem.
+                  </p>
+                  <div className="mt-6 pt-4 border-t border-border flex items-center justify-between text-[11px]">
+                     <span className="text-muted-foreground">Wynik końcowy</span>
+                     <span className="font-bold text-foreground">{(g.final_score ?? 0).toLocaleString()} XP</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">Aktywność</h2>

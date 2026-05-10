@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { CheckCircle, ChevronRight, Loader2, X, Clock3 } from "lucide-react"
+import { CheckCircle, ChevronRight, Loader2, X, Clock3, Sun, Moon } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { GamesApi, type QuizQuestionData } from "@/lib/gameApi"
 import { useGameStore } from "@/stores/gameStore"
 import { Button } from "@/components/ui/button"
+import { useTheme } from "@/components/theme-provider"
 
 export const Route = createFileRoute("/_layout/games/$gameId/quiz")({
   component: QuizPage,
@@ -151,6 +152,8 @@ function QuizPage() {
   const setReadingProgress = useGameStore((s) => s.setReadingProgress)
   const queryClient = useQueryClient()
 
+  const { resolvedTheme, setTheme } = useTheme()
+
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [allAnswered, setAllAnswered] = useState(false)
   const sourceRef = useRef<HTMLDivElement>(null)
@@ -168,6 +171,10 @@ function QuizPage() {
     setAllAnswered(allDone)
     if (allDone) setCurrentQuestion((quiz.questions?.length ?? 1) - 1)
   }, [quiz])
+
+  const toggleTheme = () => {
+    setTheme(resolvedTheme === "dark" ? "light" : "dark")
+  }
 
   const handleScroll = useCallback(() => {
     const el = sourceRef.current
@@ -211,10 +218,10 @@ function QuizPage() {
 
   return (
     <div className="min-h-svh bg-[url('/background.jpg')] bg-cover bg-center relative">
-      <div className="absolute inset-0 bg-[#8e89a8]/75 dark:bg-black/70" />
+      <div className="absolute inset-0 bg-background/75 dark:bg-black/70" />
 
       <div className="relative z-10 flex flex-col min-h-svh">
-        <header className="h-12 bg-white/90 dark:bg-[#3a3a3a]/90 border-b border-white/30 dark:border-white/10 flex items-center px-6 text-sm">
+        <header className="h-12 bg-background/90 border-b border-border flex items-center px-6 text-sm">
           <button className="flex items-center gap-2 font-semibold" onClick={() => navigate({ to: "/" })}>
             <X className="h-4 w-4" /> {quiz.title}
           </button>
@@ -225,8 +232,17 @@ function QuizPage() {
             </div>
             <span className="font-semibold">{progressPercent}%</span>
           </div>
-          <div className="flex items-center gap-2 text-xs font-semibold">
-            <Clock3 className="h-4 w-4" /> 12:45
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleTheme}
+              className="size-8 rounded-md border border-border bg-card flex items-center justify-center transition-all hover:bg-muted"
+              title="Zmień motyw"
+            >
+              {resolvedTheme === "dark" ? <Sun className="h-3.5 w-3.5 text-yellow-400" /> : <Moon className="h-3.5 w-3.5 text-primary" />}
+            </button>
+            <div className="flex items-center gap-2 text-xs font-semibold">
+              <Clock3 className="h-4 w-4" /> 12:45
+            </div>
           </div>
         </header>
 

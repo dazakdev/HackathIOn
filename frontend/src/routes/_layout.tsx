@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_layout")({
 function Layout() {
   const router = useRouterState()
   const path = router.location.pathname
-  const isFullScreen = path === "/games/new" || path.endsWith("/quiz")
+  const isFullScreen = path === "/games/new" || path.endsWith("/quiz") || path.includes("/training") || path.includes("/boss") || path.includes("/summary")
 
   if (isFullScreen) {
     return (
