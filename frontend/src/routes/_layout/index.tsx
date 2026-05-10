@@ -26,7 +26,7 @@ const DIFFICULTY_COLOR_MAP: Record<string, string> = {
 }
 export const Route = createFileRoute("/_layout/")({
   component: Dashboard,
-  head: () => ({ meta: [{ title: "Dashboard - Sensai" }] }),
+  head: () => ({ meta: [{ title: "Dashboard - Treneiro" }] }),
 })
 
 function Dashboard() {

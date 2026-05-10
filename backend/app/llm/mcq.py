@@ -173,7 +173,7 @@ def _generate_stub_mcq(question_count: int) -> str:
 
 def _system_prompt() -> str:
     return (
-        "Jestes generatorem quizow edukacyjnych dla aplikacji Sensai. "
+        "Jestes generatorem quizow edukacyjnych dla aplikacji Treneiro. "
         "Zwracasz wylacznie poprawny JSON, bez markdowna, komentarzy ani tekstu obok. "
         "Wszystkie pytania i odpowiedzi piszesz po polsku."
     )

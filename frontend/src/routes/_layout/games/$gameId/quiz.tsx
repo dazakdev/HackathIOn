@@ -10,7 +10,7 @@ import { useGameStore } from "@/stores/gameStore"
 
 export const Route = createFileRoute("/_layout/games/$gameId/quiz")({
   component: QuizPage,
-  head: () => ({ meta: [{ title: "Quiz - Sensai" }] }),
+  head: () => ({ meta: [{ title: "Quiz - Treneiro" }] }),
 })
 
 const OPTION_KEYS = ["A", "B", "C", "D"] as const

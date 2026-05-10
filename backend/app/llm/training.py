@@ -32,7 +32,7 @@ class GeneratedTrainingQuestions(BaseModel):
     questions: list[GeneratedTrainingQuestion] = Field(min_length=1)
 
 
-class SenseiAnswerEvaluation(BaseModel):
+class TreneiroAnswerEvaluation(BaseModel):
     score: int
     feedback: str
 
@@ -58,13 +58,13 @@ def generate_student_questions(
     return GeneratedTrainingQuestions.model_validate(_extract_json_object(response))
 
 
-def evaluate_sensei_answer(
+def evaluate_treneiro_answer(
     *,
     source_text: str,
     question_text: str,
     ideal_answer: str,
     user_answer: str,
-) -> SenseiAnswerEvaluation:
+) -> TreneiroAnswerEvaluation:
     text = _normalize_source_text(source_text)
     answer = user_answer.strip()
     if len(answer) < 3:
@@ -77,9 +77,9 @@ def evaluate_sensei_answer(
             ideal_answer=ideal_answer,
             user_answer=answer,
         ),
-        response_schema=SenseiAnswerEvaluation,
+        response_schema=TreneiroAnswerEvaluation,
     )
-    return SenseiAnswerEvaluation.model_validate(_extract_json_object(response))
+    return TreneiroAnswerEvaluation.model_validate(_extract_json_object(response))
 
 
 def _normalize_source_text(source_text: str) -> str:
@@ -105,7 +105,7 @@ def _generate_content(
     if not settings.GEMINI_API_KEY:
         if response_schema == GeneratedTrainingQuestions:
             return _generate_stub_training(question_count)
-        if response_schema == SenseiAnswerEvaluation:
+        if response_schema == TreneiroAnswerEvaluation:
             return _generate_stub_evaluation()
         raise ValueError(f"No stub implemented for {response_schema}")
 
@@ -153,12 +153,12 @@ def _generate_stub_evaluation() -> str:
 
 def _system_prompt() -> str:
     return (
-        "Jestes symulatorem ucznia w aplikacji Sensai. "
+        "Jestes symulatorem ucznia w aplikacji Treneiro. "
         "Twoim celem jest stworzyc wiarygodna sytuacje nauki: uczen probuje zrozumiec temat, "
         "zadaje pytania tak, jak zrobilaby to prawdziwa osoba uczaca sie z tekstu, "
         "czasem myli pojecia, prosi o przyklad, dopytuje o przyczyne, skutek albo roznice "
         "miedzy podobnymi elementami. "
-        "Pytania maja pomagac sprawdzic, czy sensei potrafi uczyc jasno, cierpliwie i poprawnie, "
+        "Pytania maja pomagac sprawdzic, czy Treneiro potrafi uczyc jasno, cierpliwie i poprawnie, "
         "a nie tylko odtworzyc definicje. "
         "Nie zdradzaj odpowiedzi w tresci pytania. "
         "Korzystaj wylacznie z informacji z tekstu zrodlowego. "

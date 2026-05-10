@@ -5,7 +5,7 @@ import { GamesApi } from "@/lib/gameApi"
 
 export const Route = createFileRoute("/_layout/leaderboard")({
   component: LeaderboardPage,
-  head: () => ({ meta: [{ title: "Ranking - Sensai" }] }),
+  head: () => ({ meta: [{ title: "Ranking - Treneiro" }] }),
 })
 
 function LeaderboardPage() {

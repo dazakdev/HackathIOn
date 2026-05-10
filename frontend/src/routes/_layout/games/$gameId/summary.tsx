@@ -18,7 +18,7 @@ import { GamesApi } from "@/lib/gameApi"
 
 export const Route = createFileRoute("/_layout/games/$gameId/summary")({
   component: SummaryPage,
-  head: () => ({ meta: [{ title: "Podsumowanie - Sensai" }] }),
+  head: () => ({ meta: [{ title: "Podsumowanie - Treneiro" }] }),
 })
 
 function SummaryPage() {

@@ -25,7 +25,7 @@ const ICONS = [
 
 export const Route = createFileRoute("/_layout/games/new")({
   component: NewGame,
-  head: () => ({ meta: [{ title: "Nowa gra - Sensai" }] }),
+  head: () => ({ meta: [{ title: "Nowa gra - Treneiro" }] }),
 })
 
 function NewGame() {
