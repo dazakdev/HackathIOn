@@ -117,16 +117,21 @@ export interface LeaderboardEntry {
 
 export const GamesApi = {
   createGame: (source_text: string) =>
-    api.post<GameDetail & { questions: QuizQuestionData[] }>("/games/", { source_text }).then((r) => r.data),
+    api
+      .post<GameDetail & { questions: QuizQuestionData[] }>("/games/", {
+        source_text,
+      })
+      .then((r) => r.data),
 
-  listGames: () =>
-    api.get<GameSummary[]>("/games/").then((r) => r.data),
+  listGames: () => api.get<GameSummary[]>("/games/").then((r) => r.data),
 
   getGame: (id: string) =>
     api.get<GameDetail>(`/games/${id}`).then((r) => r.data),
 
   updateProgress: (id: string, reading_progress: number) =>
-    api.patch(`/games/${id}/progress`, { reading_progress }).then((r) => r.data),
+    api
+      .patch(`/games/${id}/progress`, { reading_progress })
+      .then((r) => r.data),
 
   getQuiz: (id: string) =>
     api.get<QuizData>(`/games/${id}/quiz`).then((r) => r.data),
@@ -165,10 +170,14 @@ export const GamesApi = {
       .then((r) => r.data),
 
   startBossBattle: (id: string) =>
-    api.post<BossSimulationResult>(`/games/${id}/boss/start`).then((r) => r.data),
+    api
+      .post<BossSimulationResult>(`/games/${id}/boss/start`)
+      .then((r) => r.data),
 
   getBossResult: (id: string) =>
-    api.get<BossSimulationResult>(`/games/${id}/boss/result`).then((r) => r.data),
+    api
+      .get<BossSimulationResult>(`/games/${id}/boss/result`)
+      .then((r) => r.data),
 
   getLeaderboard: () =>
     api.get<LeaderboardEntry[]>("/games/leaderboard").then((r) => r.data),

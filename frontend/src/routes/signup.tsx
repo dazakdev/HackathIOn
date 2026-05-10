@@ -87,9 +87,7 @@ function SignUp() {
           className="flex flex-col gap-6"
         >
           <div className="flex flex-col gap-1">
-            <h1 className="text-3xl font-bold tracking-tight">
-              Utwórz konto.
-            </h1>
+            <h1 className="text-3xl font-bold tracking-tight">Utwórz konto.</h1>
             <p className="text-sm text-muted-foreground">
               Zarejestruj się, aby dołączyć do platformy.
             </p>

@@ -1,24 +1,16 @@
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
-import {
-  BookOpen,
-  Plus,
-  LogOut,
-  Sun,
-  Moon,
-  Award,
-} from "lucide-react"
-import { GamesApi } from "@/lib/gameApi"
-import useAuth from "@/hooks/useAuth"
+import { Award, BookOpen, LogOut, Moon, Plus, Sun } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import useAuth from "@/hooks/useAuth"
+import { GamesApi } from "@/lib/gameApi"
 
 export const Route = createFileRoute("/_layout/")({
   component: Dashboard,
   head: () => ({ meta: [{ title: "Dashboard - Sensai" }] }),
 })
-
 
 function Dashboard() {
   const { user, logout } = useAuth()
@@ -42,13 +34,19 @@ function Dashboard() {
           {(user?.total_points ?? 12450).toLocaleString("pl-PL")} XP
         </div>
         <button
+          type="button"
           onClick={toggleTheme}
           className="size-9 rounded-md border border-border bg-card shadow-sm flex items-center justify-center transition-colors hover:bg-accent"
           title="Zmień motyw"
         >
-          {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          {resolvedTheme === "dark" ? (
+            <Sun className="h-4 w-4" />
+          ) : (
+            <Moon className="h-4 w-4" />
+          )}
         </button>
         <button
+          type="button"
           onClick={logout}
           className="size-9 rounded-md border border-border bg-card shadow-sm flex items-center justify-center transition-colors hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
           title="Wyloguj"
@@ -60,7 +58,9 @@ function Dashboard() {
       <section className="rounded-xl border border-border bg-card shadow-[0_18px_40px_rgba(15,12,24,0.08)] relative overflow-hidden">
         <div className="relative p-10 space-y-6 max-w-3xl">
           <div className="space-y-2">
-            <h1 className="text-3xl font-semibold tracking-tight">Witaj z powrotem.</h1>
+            <h1 className="text-3xl font-semibold tracking-tight">
+              Witaj z powrotem.
+            </h1>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">
               Twój umysł jest jak czysta kartka, gotowy na nową wiedzę.
               Kontynuuj swoją podróż lub rozpocznij nową ścieżkę.
@@ -69,13 +69,19 @@ function Dashboard() {
 
           <div className="flex items-center gap-10 text-sm">
             <div className="space-y-1">
-              <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Obecna ranga</p>
+              <p className="text-[11px] uppercase tracking-widest text-muted-foreground">
+                Obecna ranga
+              </p>
               <p className="text-lg font-semibold">Mistrz</p>
             </div>
             <div className="h-10 w-px bg-border" />
             <div className="space-y-1">
-              <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Całkowite XP</p>
-              <p className="text-lg font-semibold">{(user?.total_points ?? 12450).toLocaleString("pl-PL")}</p>
+              <p className="text-[11px] uppercase tracking-widest text-muted-foreground">
+                Całkowite XP
+              </p>
+              <p className="text-lg font-semibold">
+                {(user?.total_points ?? 12450).toLocaleString("pl-PL")}
+              </p>
             </div>
           </div>
 
@@ -91,18 +97,26 @@ function Dashboard() {
         <h2 className="text-lg font-semibold">Twoje aktywne sesje</h2>
         {isLoading ? (
           <div className="flex gap-6 overflow-x-auto py-4">
-            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-44 min-w-[320px] rounded-lg" />)}
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-44 min-w-[320px] rounded-lg" />
+            ))}
           </div>
         ) : active.length === 0 ? (
           <div className="rounded-lg border border-dashed border-border bg-card/60 p-12 text-center">
-            <p className="text-sm text-muted-foreground">Brak aktywnych sesji.</p>
+            <p className="text-sm text-muted-foreground">
+              Brak aktywnych sesji.
+            </p>
           </div>
         ) : (
           <div className="flex gap-6 overflow-x-auto py-4 -mx-1 px-1 snap-x">
             {active.map((g) => (
               <Link
                 key={g.id}
-                to={g.reading_progress >= 100 ? "/games/$gameId/training" : "/games/$gameId/quiz"}
+                to={
+                  g.reading_progress >= 100
+                    ? "/games/$gameId/training"
+                    : "/games/$gameId/quiz"
+                }
                 params={{ gameId: g.id }}
                 className="min-w-[320px] max-w-[320px] snap-start group"
               >
@@ -115,7 +129,9 @@ function Dashboard() {
                       {g.reading_progress >= 100 ? "Trening" : "Quiz"}
                     </span>
                   </div>
-                  <h3 className="text-lg font-semibold leading-snug group-hover:text-primary transition-colors">{g.title}</h3>
+                  <h3 className="text-lg font-semibold leading-snug group-hover:text-primary transition-colors">
+                    {g.title}
+                  </h3>
                   <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                     Kontynuuj swoją przygodę edukacyjną.
                   </p>
@@ -127,7 +143,9 @@ function Dashboard() {
                     <div className="h-2 rounded-md bg-muted overflow-hidden">
                       <div
                         className="h-full rounded-md bg-primary/80 transition-all duration-500"
-                        style={{ width: `${Math.min(g.reading_progress ?? 0, 100)}%` }}
+                        style={{
+                          width: `${Math.min(g.reading_progress ?? 0, 100)}%`,
+                        }}
                       />
                     </div>
                   </div>
@@ -158,13 +176,17 @@ function Dashboard() {
                       Ukończono
                     </span>
                   </div>
-                  <h3 className="text-lg font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-1">{g.title}</h3>
+                  <h3 className="text-lg font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-1">
+                    {g.title}
+                  </h3>
                   <p className="text-[11px] text-muted-foreground mt-1">
                     Przygoda zakończona sukcesem.
                   </p>
                   <div className="mt-6 pt-4 border-t border-border flex items-center justify-between text-[11px]">
-                     <span className="text-muted-foreground">Wynik końcowy</span>
-                     <span className="font-bold text-foreground">{(g.final_score ?? 0).toLocaleString()} XP</span>
+                    <span className="text-muted-foreground">Wynik końcowy</span>
+                    <span className="font-bold text-foreground">
+                      {(g.final_score ?? 0).toLocaleString()} XP
+                    </span>
                   </div>
                 </div>
               </Link>

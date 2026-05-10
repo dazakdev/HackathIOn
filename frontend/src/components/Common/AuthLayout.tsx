@@ -17,7 +17,11 @@ export function AuthLayout({ children }: AuthLayoutProps) {
 
         {/* Logo */}
         <div className="relative z-10 px-8 pt-10">
-          <Logo variant="full" className="h-20 brightness-0 invert" asLink={false} />
+          <Logo
+            variant="full"
+            className="h-20 brightness-0 invert"
+            asLink={false}
+          />
         </div>
 
         {/* Tagline */}
@@ -28,7 +32,8 @@ export function AuthLayout({ children }: AuthLayoutProps) {
             <span className="text-white/50">Ucz się mądrzej.</span>
           </h2>
           <p className="mt-4 max-w-[280px] text-sm leading-relaxed text-white/40">
-            Twoja platforma do nauki z AI. Śledź postępy, zdobywaj doświadczenie i rozwijaj się każdego dnia.
+            Twoja platforma do nauki z AI. Śledź postępy, zdobywaj doświadczenie
+            i rozwijaj się każdego dnia.
           </p>
         </div>
 

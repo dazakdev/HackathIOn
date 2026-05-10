@@ -25,7 +25,12 @@ export const useGameStore = create<GameStore>()(
       quizAnswers: {},
 
       setGame: (gameId, phase) =>
-        set({ currentGameId: gameId, currentPhase: phase, readingProgress: 0, quizAnswers: {} }),
+        set({
+          currentGameId: gameId,
+          currentPhase: phase,
+          readingProgress: 0,
+          quizAnswers: {},
+        }),
 
       setPhase: (phase) => set({ currentPhase: phase }),
 

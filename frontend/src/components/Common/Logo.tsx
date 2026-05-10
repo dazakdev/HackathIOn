@@ -53,7 +53,7 @@ export function Logo({
         className={cn(
           variant === "full" ? "h-10 w-auto" : "size-8",
           isDark && "brightness-0 invert",
-          className
+          className,
         )}
       />
     )

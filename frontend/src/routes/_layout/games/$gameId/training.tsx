@@ -1,26 +1,46 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { ChevronRight, Loader2, Send, Bot, User, Award, Info, X, Clock3, BookOpen, Sun, Moon } from "lucide-react"
-import { useState, useRef, useEffect } from "react"
+import {
+  Award,
+  BookOpen,
+  Bot,
+  ChevronRight,
+  Clock3,
+  Info,
+  Loader2,
+  Moon,
+  Send,
+  Sun,
+  User,
+  X,
+} from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
-import { GamesApi, type TrainingQuestionData } from "@/lib/gameApi"
-import { useGameStore } from "@/stores/gameStore"
-import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/Common/Logo"
 import { useTheme } from "@/components/theme-provider"
+import { Button } from "@/components/ui/button"
+import { GamesApi, type TrainingQuestionData } from "@/lib/gameApi"
+import { useGameStore } from "@/stores/gameStore"
 
 export const Route = createFileRoute("/_layout/games/$gameId/training")({
   component: TrainingPage,
   head: () => ({ meta: [{ title: "Trening - Sensai" }] }),
 })
 
-
-function ScoreIndicator({ score }: { score: number }) {
+function _ScoreIndicator({ score }: { score: number }) {
   const color =
-    score >= 80 ? "text-green-500 bg-green-500/10" : score >= 60 ? "text-yellow-500 bg-yellow-500/10" : score >= 40 ? "text-orange-500 bg-orange-500/10" : "text-red-500 bg-red-500/10"
+    score >= 80
+      ? "text-green-500 bg-green-500/10"
+      : score >= 60
+        ? "text-yellow-500 bg-yellow-500/10"
+        : score >= 40
+          ? "text-orange-500 bg-orange-500/10"
+          : "text-red-500 bg-red-500/10"
 
   return (
-    <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-bold ${color}`}>
+    <div
+      className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-bold ${color}`}
+    >
       <Award className="h-3.5 w-3.5" />
       <span>{score}/100</span>
     </div>
@@ -52,12 +72,22 @@ function ChatMessage({
   }
 
   return (
-    <div className={`flex gap-4 my-6 w-full ${isSensai ? "flex-row-reverse" : ""}`}>
-      <div className={`shrink-0 size-10 rounded-md flex items-center justify-center ${isStudent ? "bg-muted border border-border" : "bg-primary border border-primary/20"}`}>
-        {isStudent ? <Bot className="h-4 w-4 text-muted-foreground" /> : <User className="h-4 w-4 text-primary-foreground" />}
+    <div
+      className={`flex gap-4 my-6 w-full ${isSensai ? "flex-row-reverse" : ""}`}
+    >
+      <div
+        className={`shrink-0 size-10 rounded-md flex items-center justify-center ${isStudent ? "bg-muted border border-border" : "bg-primary border border-primary/20"}`}
+      >
+        {isStudent ? (
+          <Bot className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <User className="h-4 w-4 text-primary-foreground" />
+        )}
       </div>
       <div className={`max-w-[70%] ${isSensai ? "text-right" : "text-left"}`}>
-        <div className={`inline-block rounded-lg px-4 py-3 text-sm shadow-xl ${isSensai ? "bg-card text-card-foreground border border-border" : "bg-muted/50 border border-border text-foreground"}`}>
+        <div
+          className={`inline-block rounded-lg px-4 py-3 text-sm shadow-xl ${isSensai ? "bg-card text-card-foreground border border-border" : "bg-muted/50 border border-border text-foreground"}`}
+        >
           {content}
           {children}
         </div>
@@ -73,7 +103,9 @@ function TrainingPage() {
   const queryClient = useQueryClient()
   const { resolvedTheme, setTheme } = useTheme()
 
-  const [questions, setQuestions] = useState<TrainingQuestionData[] | null>(null)
+  const [questions, setQuestions] = useState<TrainingQuestionData[] | null>(
+    null,
+  )
   const [currentAnswer, setCurrentAnswer] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -124,13 +156,15 @@ function TrainingPage() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [displayQuestions, isPending])
+  }, [])
 
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background gap-4">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <span className="text-muted-foreground font-medium text-lg">Przygotowuję sesję treningową…</span>
+        <span className="text-muted-foreground font-medium text-lg">
+          Przygotowuję sesję treningową…
+        </span>
       </div>
     )
   }
@@ -162,12 +196,18 @@ function TrainingPage() {
               ALE SUPER!
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-primary" />
             </div>
-            <img src="/assets/images/student.gif" alt="Uczeń" className="w-56 drop-shadow-[0_0_30px_var(--color-primary)]" />
+            <img
+              src="/assets/images/student.gif"
+              alt="Uczeń"
+              className="w-56 drop-shadow-[0_0_30px_var(--color-primary)]"
+            />
           </div>
 
           <div className="text-center space-y-2">
             <h3 className="text-foreground font-bold">Twój Uczeń</h3>
-            <p className="text-muted-foreground text-xs px-4">Wyjaśniaj pojęcia prosto i obrazowo, aby uczeń mógł pokonać bossa!</p>
+            <p className="text-muted-foreground text-xs px-4">
+              Wyjaśniaj pojęcia prosto i obrazowo, aby uczeń mógł pokonać bossa!
+            </p>
           </div>
         </div>
 
@@ -189,8 +229,12 @@ function TrainingPage() {
               <BookOpen className="h-5 w-5" />
             </div>
             <div className="flex flex-col">
-              <h2 className="font-bold text-foreground leading-tight">Wprowadzenie do Stoicyzmu</h2>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-bold">Faza 2: Trening Ucznia</span>
+              <h2 className="font-bold text-foreground leading-tight">
+                Wprowadzenie do Stoicyzmu
+              </h2>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-bold">
+                Faza 2: Trening Ucznia
+              </span>
             </div>
           </div>
 
@@ -198,37 +242,54 @@ function TrainingPage() {
             <div className="flex flex-col items-end gap-1.5">
               <div className="flex items-center justify-between w-48 text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
                 <span>Postęp</span>
-                <span>{Math.round((answered / Math.max(total, 1)) * 100)}%</span>
+                <span>
+                  {Math.round((answered / Math.max(total, 1)) * 100)}%
+                </span>
               </div>
               <div className="w-48 h-2 rounded-full bg-muted overflow-hidden border border-border">
-                <div className="h-full bg-primary shadow-[0_0_10px_var(--color-primary)] transition-all duration-700" style={{ width: total > 0 ? `${(answered / total) * 100}%` : "0%" }} />
+                <div
+                  className="h-full bg-primary shadow-[0_0_10px_var(--color-primary)] transition-all duration-700"
+                  style={{
+                    width: total > 0 ? `${(answered / total) * 100}%` : "0%",
+                  }}
+                />
               </div>
             </div>
             <div className="h-10 w-px bg-border" />
             <div className="flex items-center gap-3">
               <button
+                type="button"
                 onClick={toggleTheme}
                 className="size-10 rounded-lg border border-border bg-card flex items-center justify-center transition-all hover:bg-muted"
                 title="Zmień motyw"
               >
-                {resolvedTheme === "dark" ? <Sun className="h-4.5 w-4.5 text-yellow-400" /> : <Moon className="h-4.5 w-4.5 text-primary" />}
+                {resolvedTheme === "dark" ? (
+                  <Sun className="h-4.5 w-4.5 text-yellow-400" />
+                ) : (
+                  <Moon className="h-4.5 w-4.5 text-primary" />
+                )}
               </button>
               <div className="flex items-center gap-2.5 px-4 py-2 rounded-lg bg-card border border-border">
                 <Clock3 className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-bold text-foreground font-mono tracking-wider">12:45</span>
+                <span className="text-sm font-bold text-foreground font-mono tracking-wider">
+                  12:45
+                </span>
               </div>
             </div>
           </div>
         </header>
 
         {/* Scrollable messages */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-10 space-y-4 scroll-smooth z-0">
+        <div
+          ref={scrollRef}
+          className="flex-1 overflow-y-auto p-10 space-y-4 scroll-smooth z-0"
+        >
           {displayQuestions.map((q, idx) => {
             if (q.score === null && q.id !== currentQuestion?.id) return null
 
             return (
               <div key={q.id} className="mb-12">
-                <ChatMessage role="student">
+                <ChatMessage>
                   <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-primary">
                     Pytanie od ucznia {idx + 1}
                   </div>
@@ -236,21 +297,21 @@ function TrainingPage() {
                 </ChatMessage>
 
                 {q.user_answer && (
-                  <ChatMessage role="sensai">
+                  <ChatMessage>
                     <p className="text-base leading-relaxed">{q.user_answer}</p>
                   </ChatMessage>
                 )}
-
-
               </div>
             )
           })}
 
           {isPending && (
-            <ChatMessage role="system">
+            <ChatMessage>
               <div className="flex items-center gap-3 py-2">
                 <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                <span className="font-medium text-muted-foreground">Uczeń analizuje Twoje słowa...</span>
+                <span className="font-medium text-muted-foreground">
+                  Uczeń analizuje Twoje słowa...
+                </span>
               </div>
             </ChatMessage>
           )}
@@ -263,8 +324,14 @@ function TrainingPage() {
               <div className="size-12 rounded-full bg-green-500/20 flex items-center justify-center text-green-500 mb-4">
                 <Award className="h-6 w-6" />
               </div>
-              <p className="text-lg font-bold text-foreground mb-6">Twój uczeń jest gotowy do wielkiego starcia!</p>
-              <Button size="lg" className="w-full max-w-sm gap-3 font-bold h-14 text-lg shadow-xl" onClick={goToBoss}>
+              <p className="text-lg font-bold text-foreground mb-6">
+                Twój uczeń jest gotowy do wielkiego starcia!
+              </p>
+              <Button
+                size="lg"
+                className="w-full max-w-sm gap-3 font-bold h-14 text-lg shadow-xl"
+                onClick={goToBoss}
+              >
                 Rozpocznij walkę z Bossem <ChevronRight className="h-6 w-6" />
               </Button>
             </div>
@@ -288,7 +355,10 @@ function TrainingPage() {
                     disabled={isPending}
                   />
                   <div className="flex items-center justify-between text-[10px] text-muted-foreground mt-3 font-bold uppercase tracking-widest px-1">
-                    <span className="flex items-center gap-1.5"><Info className="h-3 w-3" /> Press Enter to send explanation</span>
+                    <span className="flex items-center gap-1.5">
+                      <Info className="h-3 w-3" /> Press Enter to send
+                      explanation
+                    </span>
                     <span>{currentAnswer.length} chars</span>
                   </div>
                 </div>
@@ -298,7 +368,11 @@ function TrainingPage() {
                   disabled={isPending || currentAnswer.trim().length < 3}
                   onClick={() => submitAnswer(currentAnswer.trim())}
                 >
-                  {isPending ? <Loader2 className="h-6 w-6 animate-spin" /> : <Send className="h-6 w-6" />}
+                  {isPending ? (
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  ) : (
+                    <Send className="h-6 w-6" />
+                  )}
                 </Button>
               </div>
             )

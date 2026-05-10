@@ -1,4 +1,9 @@
-import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/react-router"
+import {
+  createFileRoute,
+  Outlet,
+  redirect,
+  useRouterState,
+} from "@tanstack/react-router"
 
 import AppSidebar from "@/components/Sidebar/AppSidebar"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
@@ -18,7 +23,12 @@ export const Route = createFileRoute("/_layout")({
 function Layout() {
   const router = useRouterState()
   const path = router.location.pathname
-  const isFullScreen = path === "/games/new" || path.endsWith("/quiz") || path.includes("/training") || path.includes("/boss") || path.includes("/summary")
+  const isFullScreen =
+    path === "/games/new" ||
+    path.endsWith("/quiz") ||
+    path.includes("/training") ||
+    path.includes("/boss") ||
+    path.includes("/summary")
 
   if (isFullScreen) {
     return (
