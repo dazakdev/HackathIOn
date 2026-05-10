@@ -173,12 +173,9 @@ function TrainingPage() {
 
         <div className="flex-1 flex flex-col items-center justify-center gap-10">
           <div className="relative">
-            <div className="absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-xl bg-primary text-primary-foreground px-6 py-3 text-sm font-bold shadow-2xl animate-bounce">
-              ALE SUPER!
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-primary" />
-            </div>
+
             <img
-              src="/assets/images/student.gif"
+              src="/ninja/fight.gif"
               alt="Uczeń"
               className="w-56 drop-shadow-[0_0_30px_var(--color-primary)]"
             />

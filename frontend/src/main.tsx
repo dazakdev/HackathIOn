@@ -45,7 +45,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
-        <Toaster richColors closeButton />
+        <Toaster
+          position="top-right"
+          richColors
+          closeButton
+          toastOptions={{
+            className: "backdrop-blur-xl bg-background/60 border-border shadow-2xl",
+          }}
+        />
       </QueryClientProvider>
     </ThemeProvider>
   </StrictMode>,
