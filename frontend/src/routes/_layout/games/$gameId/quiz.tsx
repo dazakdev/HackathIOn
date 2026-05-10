@@ -219,10 +219,19 @@ function QuizPage() {
 
   useEffect(() => {
     if (!quiz) return
-    const answered = Object.keys(quiz.answers ?? {})
-    const allDone = answered.length >= (quiz.questions?.length ?? 0)
+    const questions = quiz.questions ?? []
+    const answers = quiz.answers ?? {}
+    const answeredKeys = Object.keys(answers)
+    const allDone = answeredKeys.length >= questions.length
     setAllAnswered(allDone)
-    if (allDone) setCurrentQuestion((quiz.questions?.length ?? 1) - 1)
+
+    // Resume from the first unanswered question
+    const firstUnansweredIndex = questions.findIndex((q) => !answers[q.id])
+    if (firstUnansweredIndex !== -1) {
+      setCurrentQuestion(firstUnansweredIndex)
+    } else if (allDone && questions.length > 0) {
+      setCurrentQuestion(questions.length - 1)
+    }
   }, [quiz])
 
   const toggleTheme = () => {
