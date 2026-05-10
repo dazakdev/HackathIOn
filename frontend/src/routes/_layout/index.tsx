@@ -3,11 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import {
   BookOpen,
   Plus,
-  Bell,
-  User as UserIcon,
+  LogOut,
+  Sun,
+  Moon,
 } from "lucide-react"
 import { GamesApi } from "@/lib/gameApi"
 import useAuth from "@/hooks/useAuth"
+import { useTheme } from "@/components/theme-provider"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -18,7 +20,8 @@ export const Route = createFileRoute("/_layout/")({
 
 
 function Dashboard() {
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
+  const { resolvedTheme, setTheme } = useTheme()
   const { data: games, isLoading } = useQuery({
     queryKey: ["games"],
     queryFn: GamesApi.listGames,
@@ -26,17 +29,29 @@ function Dashboard() {
 
   const active = games?.filter((g) => g.status !== "completed") ?? []
 
+  const toggleTheme = () => {
+    setTheme(resolvedTheme === "dark" ? "light" : "dark")
+  }
+
   return (
     <div className="mx-auto max-w-[1180px] space-y-10 pb-12">
       <div className="flex items-center justify-end gap-3">
         <div className="rounded-md bg-card px-4 py-2 text-sm font-semibold shadow-sm border border-border">
           {(user?.total_points ?? 12450).toLocaleString("pl-PL")} XP
         </div>
-        <button className="size-9 rounded-md border border-border bg-card shadow-sm flex items-center justify-center">
-          <Bell className="h-4 w-4" />
+        <button
+          onClick={toggleTheme}
+          className="size-9 rounded-md border border-border bg-card shadow-sm flex items-center justify-center transition-colors hover:bg-accent"
+          title="Zmień motyw"
+        >
+          {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </button>
-        <button className="size-9 rounded-md border border-border bg-card shadow-sm flex items-center justify-center">
-          <UserIcon className="h-4 w-4" />
+        <button
+          onClick={logout}
+          className="size-9 rounded-md border border-border bg-card shadow-sm flex items-center justify-center transition-colors hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+          title="Wyloguj"
+        >
+          <LogOut className="h-4 w-4" />
         </button>
       </div>
 
@@ -74,42 +89,49 @@ function Dashboard() {
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">Twoje aktywne sesje</h2>
         {isLoading ? (
-          <div className="grid gap-6 sm:grid-cols-2">
-            {[1, 2].map((i) => <Skeleton key={i} className="h-44 rounded-lg" />)}
+          <div className="flex gap-6 overflow-x-auto pb-4">
+            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-44 min-w-[320px] rounded-lg" />)}
           </div>
         ) : active.length === 0 ? (
           <div className="rounded-lg border border-dashed border-border bg-card/60 p-12 text-center">
             <p className="text-sm text-muted-foreground">Brak aktywnych sesji.</p>
           </div>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2">
-            {active.slice(0, 2).map((g) => (
-              <div key={g.id} className="rounded-lg border border-border bg-card shadow-[0_12px_30px_rgba(15,12,24,0.06)] p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="size-9 rounded-md bg-muted flex items-center justify-center">
-                    <BookOpen className="h-4 w-4" />
+          <div className="flex gap-6 overflow-x-auto pb-6 -mx-1 px-1 snap-x">
+            {active.map((g) => (
+              <Link
+                key={g.id}
+                to={g.reading_progress >= 100 ? "/games/$gameId/training" : "/games/$gameId/quiz"}
+                params={{ gameId: g.id }}
+                className="min-w-[320px] max-w-[320px] snap-start group"
+              >
+                <div className="h-full rounded-lg border border-border bg-card shadow-[0_12px_30px_rgba(15,12,24,0.06)] p-6 transition-all duration-200 group-hover:shadow-lg group-hover:border-primary/40 group-hover:-translate-y-1">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="size-9 rounded-md bg-muted flex items-center justify-center transition-colors group-hover:bg-primary/10">
+                      <BookOpen className="h-4 w-4 transition-colors group-hover:text-primary" />
+                    </div>
+                    <span className="text-[11px] uppercase tracking-widest bg-muted px-3 py-1 rounded-md text-muted-foreground">
+                      {g.reading_progress >= 100 ? "Trening" : "Quiz"}
+                    </span>
                   </div>
-                  <span className="text-[11px] uppercase tracking-widest bg-muted px-3 py-1 rounded-md text-muted-foreground">
-                    {g.reading_progress >= 100 ? "Teaching" : "Learning"}
-                  </span>
+                  <h3 className="text-lg font-semibold leading-snug group-hover:text-primary transition-colors">{g.title}</h3>
+                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                    Kontynuuj swoją przygodę edukacyjną.
+                  </p>
+                  <div className="mt-6 space-y-2">
+                    <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                      <span>Postęp</span>
+                      <span>{Math.min(g.reading_progress ?? 0, 100)}%</span>
+                    </div>
+                    <div className="h-2 rounded-md bg-muted overflow-hidden">
+                      <div
+                        className="h-full rounded-md bg-primary/80 transition-all duration-500"
+                        style={{ width: `${Math.min(g.reading_progress ?? 0, 100)}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-lg font-semibold leading-snug">{g.title}</h3>
-                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                  Kontynuuj swoją przygodę edukacyjną.
-                </p>
-                <div className="mt-6 space-y-2">
-                  <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                    <span>Postęp</span>
-                    <span>{Math.min(g.reading_progress ?? 0, 100)}%</span>
-                  </div>
-                  <div className="h-2 rounded-md bg-muted overflow-hidden">
-                    <div
-                      className="h-full rounded-md bg-primary/80"
-                      style={{ width: `${Math.min(g.reading_progress ?? 0, 100)}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

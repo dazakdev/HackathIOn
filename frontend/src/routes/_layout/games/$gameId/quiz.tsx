@@ -215,7 +215,7 @@ function QuizPage() {
 
       <div className="relative z-10 flex flex-col min-h-svh">
         <header className="h-12 bg-white/90 dark:bg-[#3a3a3a]/90 border-b border-white/30 dark:border-white/10 flex items-center px-6 text-sm">
-          <button className="flex items-center gap-2 font-semibold">
+          <button className="flex items-center gap-2 font-semibold" onClick={() => navigate({ to: "/" })}>
             <X className="h-4 w-4" /> {quiz.title}
           </button>
           <div className="flex-1 flex items-center justify-center gap-4 text-xs text-muted-foreground">
@@ -257,26 +257,38 @@ function QuizPage() {
               <div className="space-y-6">
                 <div className="flex items-center gap-2 text-sm font-semibold">
                   <span className="size-6 rounded-md bg-primary/20 flex items-center justify-center text-primary">?</span>
-                  Sprawdź wiedzę
+                  {quiz.status === "training_ready" ? "Quiz ukończony!" : "Sprawdź wiedzę"}
                 </div>
-                {q && (
-                  <QuestionCard
-                    key={q.id}
-                    question={q}
-                    existingAnswer={quiz.answers?.[q.id] as any}
-                    onAnswered={(done) => {
-                      if (done) {
-                        setAllAnswered(true)
-                      } else if (currentQuestion < questions.length - 1) {
-                        setTimeout(() => setCurrentQuestion((p) => p + 1), 1500)
-                      }
-                    }}
-                  />
+                
+                {quiz.status === "training_ready" ? (
+                  <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4 py-10">
+                    <div className="size-16 rounded-full bg-green-500/20 flex items-center justify-center text-green-500 mb-2">
+                      <CheckCircle className="h-8 w-8" />
+                    </div>
+                    <h3 className="text-lg font-bold">Wszystkie odpowiedzi udzielone!</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Twój uczeń przyswoił podstawową wiedzę z tekstu. Teraz czas sprawdzić, jak poradzi sobie z Twoimi wyjaśnieniami w sesji treningowej.
+                    </p>
+                  </div>
+                ) : (
+                  q && (
+                    <QuestionCard
+                      key={q.id}
+                      question={q}
+                      existingAnswer={quiz.answers?.[q.id] as any}
+                      onAnswered={(done) => {
+                        queryClient.invalidateQueries({ queryKey: ["quiz", gameId] })
+                        if (done) {
+                          setAllAnswered(true)
+                        }
+                      }}
+                    />
+                  )
                 )}
               </div>
 
               <div className="pt-6">
-                {allAnswered ? (
+                {allAnswered || quiz.status === "training_ready" ? (
                   <Button
                     size="lg"
                     className="w-full rounded-lg font-semibold bg-white text-black hover:bg-white/90"
@@ -288,9 +300,9 @@ function QuizPage() {
                   <Button
                     className="w-full rounded-lg font-semibold bg-white text-black hover:bg-white/90"
                     onClick={() => setCurrentQuestion((p) => Math.min(questions.length - 1, p + 1))}
-                    disabled={currentQuestion === questions.length - 1}
+                    disabled={!quiz.answers?.[q.id]}
                   >
-                    Następna część
+                    Kolejne pytanie
                   </Button>
                 )}
               </div>

@@ -9,6 +9,8 @@ import { Logo } from "@/components/Common/Logo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
+const ICONS = ["⚡", "✨", "🧠"] as const
+
 export const Route = createFileRoute("/_layout/games/new")({
   component: NewGame,
   head: () => ({ meta: [{ title: "Nowa gra - Sensai" }] }),
@@ -23,6 +25,7 @@ function NewGame() {
   const [description, setDescription] = useState("")
   const [text, setText] = useState("")
   const [difficulty, setDifficulty] = useState("easy")
+  const [selectedIcon, setSelectedIcon] = useState("✨")
 
   const { mutate, isPending } = useMutation({
     mutationFn: (source_text: string) => GamesApi.createGame(source_text),
@@ -45,7 +48,10 @@ function NewGame() {
       <div className="relative z-10 flex flex-col items-center px-6 pb-16">
         <div className="w-full max-w-5xl pt-8">
           <div className="rounded-lg bg-card/90 dark:bg-black/30 border border-white/30 dark:border-white/10 px-6 py-3 flex items-center justify-between shadow-lg">
-            <button className="flex items-center gap-2 text-sm font-medium">
+            <button
+              className="flex items-center gap-2 text-sm font-medium"
+              onClick={() => navigate({ to: "/" })}
+            >
               <ArrowLeft className="h-4 w-4" /> Przerwij
             </button>
             <Logo variant="icon" className="h-6 w-auto" asLink={false} />
@@ -95,10 +101,12 @@ function NewGame() {
                 <div className="space-y-2">
                   <label className="text-xs font-semibold">Ikona</label>
                   <div className="flex items-center gap-3">
-                    {["⚡", "✨", "🧠"].map((icon) => (
+                    {ICONS.map((icon) => (
                       <button
                         key={icon}
-                        className={`size-9 rounded-md border text-sm ${icon === "✨" ? "bg-primary text-primary-foreground border-primary" : "bg-background/70 dark:bg-black/20 border-border"}`}
+                        onClick={() => setSelectedIcon(icon)}
+                        disabled={isPending}
+                        className={`size-9 rounded-full border text-sm transition-all duration-200 ${selectedIcon === icon ? "bg-primary text-primary-foreground border-primary shadow-md scale-110" : "bg-background/70 dark:bg-black/20 border-border hover:border-primary/40 hover:scale-105"}`}
                       >
                         {icon}
                       </button>
@@ -133,16 +141,29 @@ function NewGame() {
                   key={lvl.id}
                   onClick={() => setDifficulty(lvl.id)}
                   disabled={isPending}
-                  className={`w-full text-left p-4 rounded-lg border transition-all ${
+                  className={`w-full text-left p-4 rounded-lg border transition-all duration-200 ${
                     difficulty === lvl.id
                       ? "border-primary bg-primary/10"
-                      : "border-border/60 bg-background/60 dark:bg-black/20"
+                      : "border-border/60 bg-background/60 dark:bg-black/20 hover:border-primary/30"
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`size-4 rounded-md border ${difficulty === lvl.id ? "border-primary bg-primary" : "border-muted-foreground"}`} />
+                    {/* Circular radio indicator */}
+                    <div
+                      className={`size-5 shrink-0 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                        difficulty === lvl.id
+                          ? "border-primary"
+                          : "border-muted-foreground/50"
+                      }`}
+                    >
+                      {difficulty === lvl.id && (
+                        <div className="size-2.5 rounded-full bg-primary" />
+                      )}
+                    </div>
                     <div>
-                      <div className="text-sm font-semibold">{lvl.label}</div>
+                      <div className={`text-sm font-semibold ${
+                        lvl.id === "hard" ? "text-primary" : ""
+                      }`}>{lvl.label}</div>
                       <div className="text-xs text-muted-foreground">{lvl.desc}</div>
                     </div>
                   </div>
