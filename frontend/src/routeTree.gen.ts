@@ -22,7 +22,6 @@ import { Route as LayoutGamesNewRouteImport } from './routes/_layout/games/new'
 import { Route as LayoutGamesGameIdTrainingRouteImport } from './routes/_layout/games/$gameId/training'
 import { Route as LayoutGamesGameIdSummaryRouteImport } from './routes/_layout/games/$gameId/summary'
 import { Route as LayoutGamesGameIdQuizRouteImport } from './routes/_layout/games/$gameId/quiz'
-import { Route as LayoutGamesGameIdBossRouteImport } from './routes/_layout/games/$gameId/boss'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -90,11 +89,6 @@ const LayoutGamesGameIdQuizRoute = LayoutGamesGameIdQuizRouteImport.update({
   path: '/games/$gameId/quiz',
   getParentRoute: () => LayoutRoute,
 } as any)
-const LayoutGamesGameIdBossRoute = LayoutGamesGameIdBossRouteImport.update({
-  id: '/games/$gameId/boss',
-  path: '/games/$gameId/boss',
-  getParentRoute: () => LayoutRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof LayoutIndexRoute
@@ -106,7 +100,6 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof LayoutLeaderboardRoute
   '/settings': typeof LayoutSettingsRoute
   '/games/new': typeof LayoutGamesNewRoute
-  '/games/$gameId/boss': typeof LayoutGamesGameIdBossRoute
   '/games/$gameId/quiz': typeof LayoutGamesGameIdQuizRoute
   '/games/$gameId/summary': typeof LayoutGamesGameIdSummaryRoute
   '/games/$gameId/training': typeof LayoutGamesGameIdTrainingRoute
@@ -121,7 +114,6 @@ export interface FileRoutesByTo {
   '/settings': typeof LayoutSettingsRoute
   '/': typeof LayoutIndexRoute
   '/games/new': typeof LayoutGamesNewRoute
-  '/games/$gameId/boss': typeof LayoutGamesGameIdBossRoute
   '/games/$gameId/quiz': typeof LayoutGamesGameIdQuizRoute
   '/games/$gameId/summary': typeof LayoutGamesGameIdSummaryRoute
   '/games/$gameId/training': typeof LayoutGamesGameIdTrainingRoute
@@ -138,7 +130,6 @@ export interface FileRoutesById {
   '/_layout/settings': typeof LayoutSettingsRoute
   '/_layout/': typeof LayoutIndexRoute
   '/_layout/games/new': typeof LayoutGamesNewRoute
-  '/_layout/games/$gameId/boss': typeof LayoutGamesGameIdBossRoute
   '/_layout/games/$gameId/quiz': typeof LayoutGamesGameIdQuizRoute
   '/_layout/games/$gameId/summary': typeof LayoutGamesGameIdSummaryRoute
   '/_layout/games/$gameId/training': typeof LayoutGamesGameIdTrainingRoute
@@ -155,7 +146,6 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/settings'
     | '/games/new'
-    | '/games/$gameId/boss'
     | '/games/$gameId/quiz'
     | '/games/$gameId/summary'
     | '/games/$gameId/training'
@@ -170,7 +160,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/'
     | '/games/new'
-    | '/games/$gameId/boss'
     | '/games/$gameId/quiz'
     | '/games/$gameId/summary'
     | '/games/$gameId/training'
@@ -186,7 +175,6 @@ export interface FileRouteTypes {
     | '/_layout/settings'
     | '/_layout/'
     | '/_layout/games/new'
-    | '/_layout/games/$gameId/boss'
     | '/_layout/games/$gameId/quiz'
     | '/_layout/games/$gameId/summary'
     | '/_layout/games/$gameId/training'
@@ -293,13 +281,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutGamesGameIdQuizRouteImport
       parentRoute: typeof LayoutRoute
     }
-    '/_layout/games/$gameId/boss': {
-      id: '/_layout/games/$gameId/boss'
-      path: '/games/$gameId/boss'
-      fullPath: '/games/$gameId/boss'
-      preLoaderRoute: typeof LayoutGamesGameIdBossRouteImport
-      parentRoute: typeof LayoutRoute
-    }
   }
 }
 
@@ -309,7 +290,6 @@ interface LayoutRouteChildren {
   LayoutSettingsRoute: typeof LayoutSettingsRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
   LayoutGamesNewRoute: typeof LayoutGamesNewRoute
-  LayoutGamesGameIdBossRoute: typeof LayoutGamesGameIdBossRoute
   LayoutGamesGameIdQuizRoute: typeof LayoutGamesGameIdQuizRoute
   LayoutGamesGameIdSummaryRoute: typeof LayoutGamesGameIdSummaryRoute
   LayoutGamesGameIdTrainingRoute: typeof LayoutGamesGameIdTrainingRoute
@@ -321,7 +301,6 @@ const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutSettingsRoute: LayoutSettingsRoute,
   LayoutIndexRoute: LayoutIndexRoute,
   LayoutGamesNewRoute: LayoutGamesNewRoute,
-  LayoutGamesGameIdBossRoute: LayoutGamesGameIdBossRoute,
   LayoutGamesGameIdQuizRoute: LayoutGamesGameIdQuizRoute,
   LayoutGamesGameIdSummaryRoute: LayoutGamesGameIdSummaryRoute,
   LayoutGamesGameIdTrainingRoute: LayoutGamesGameIdTrainingRoute,

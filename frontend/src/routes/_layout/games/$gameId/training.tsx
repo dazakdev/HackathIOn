@@ -154,10 +154,41 @@ function TrainingPage() {
     setTheme(resolvedTheme === "dark" ? "light" : "dark")
   }
 
+  const { mutate: startBattle, isPending: isStartingBattle } = useMutation({
+    mutationFn: () => GamesApi.startBossBattle(gameId),
+    onSuccess: () => {
+      setPhase("summary")
+      queryClient.invalidateQueries({ queryKey: ["games"] })
+      navigate({ to: "/games/$gameId/summary", params: { gameId } })
+    },
+    onError: (err: any) => {
+      toast.error(
+        err?.response?.data?.detail ?? err?.message ?? "Nie udało się rozpocząć walki",
+      )
+    },
+  })
+
   const goToBoss = () => {
-    setPhase("boss")
-    queryClient.invalidateQueries({ queryKey: ["games"] })
-    navigate({ to: "/games/$gameId/boss", params: { gameId } })
+    startBattle()
+  }
+
+  if (isStartingBattle) {
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-background gap-6 z-50">
+        <div className="relative">
+          <div className="absolute -inset-4 bg-primary/20 rounded-full blur-2xl animate-pulse" />
+          <Loader2 className="h-16 w-16 animate-spin text-primary relative z-10" />
+        </div>
+        <div className="text-center space-y-2 relative z-10">
+          <h2 className="text-2xl font-black text-foreground uppercase tracking-tighter">
+            Trwa decydujące starcie...
+          </h2>
+          <p className="text-muted-foreground font-medium">
+            Twój uczeń właśnie walczy z bossem. Zaraz poznamy wyniki!
+          </p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -247,12 +278,7 @@ function TrainingPage() {
                   <Moon className="h-4.5 w-4.5 text-primary" />
                 )}
               </button>
-              <div className="flex items-center gap-2.5 px-4 py-2 rounded-lg bg-card border border-border">
-                <Clock3 className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-bold text-foreground font-mono tracking-wider">
-                  12:45
-                </span>
-              </div>
+
             </div>
           </div>
         </header>
@@ -310,7 +336,7 @@ function TrainingPage() {
                 className="w-full max-w-sm gap-3 font-bold h-14 text-lg shadow-xl"
                 onClick={goToBoss}
               >
-                Rozpocznij walkę z Bossem <ChevronRight className="h-6 w-6" />
+                Zakończ trening i sprawdź wyniki <ChevronRight className="h-6 w-6" />
               </Button>
             </div>
           ) : (

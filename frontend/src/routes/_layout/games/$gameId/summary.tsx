@@ -138,12 +138,7 @@ function SummaryPage() {
                         <Moon className="h-4 w-4 text-primary" />
                      )}
                   </button>
-                  <div className="flex items-center gap-3 px-5 py-2.5 rounded-xl bg-card border border-border">
-                     <Clock3 className="h-4 w-4 text-primary opacity-70" />
-                     <span className="text-base font-black text-foreground font-mono tracking-wider">
-                        12:45
-                     </span>
-                  </div>
+
                </div>
             </header>
 

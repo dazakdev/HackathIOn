@@ -317,9 +317,7 @@ function QuizPage() {
                 <Moon className="h-3.5 w-3.5 text-primary" />
               )}
             </button>
-            <div className="flex items-center gap-2 text-xs font-semibold">
-              <Clock3 className="h-4 w-4" /> 12:45
-            </div>
+
           </div>
         </header>
 

@@ -72,15 +72,24 @@ function Dashboard() {
               <p className="text-[11px] uppercase tracking-widest text-muted-foreground">
                 Obecna ranga
               </p>
-              <p className="text-lg font-semibold">Mistrz</p>
+              <p className="text-lg font-black text-primary">
+                {(() => {
+                  const p = user?.total_points ?? 0
+                  if (p >= 15000) return "Mistrz"
+                  if (p >= 7000) return "Ekspert"
+                  if (p >= 3000) return "Czeladnik"
+                  if (p >= 1000) return "Uczeń"
+                  return "Nowicjusz"
+                })()}
+              </p>
             </div>
             <div className="h-10 w-px bg-border" />
             <div className="space-y-1">
               <p className="text-[11px] uppercase tracking-widest text-muted-foreground">
                 Całkowite XP
               </p>
-              <p className="text-lg font-semibold">
-                {(user?.total_points ?? 12450).toLocaleString("pl-PL")}
+              <p className="text-lg font-bold">
+                {(user?.total_points ?? 0).toLocaleString("pl-PL")}
               </p>
             </div>
           </div>
@@ -195,30 +204,7 @@ function Dashboard() {
         </section>
       )}
 
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold">Aktywność</h2>
-        <div className="rounded-lg border border-border bg-card shadow-[0_12px_30px_rgba(15,12,24,0.06)] p-6 max-w-md">
-          <div className="flex items-center justify-between text-sm font-semibold mb-4">
-            <span>Ten tydzień</span>
-            <span className="text-muted-foreground">···</span>
-          </div>
-          {["Pon", "Wto", "Śro", "Czw", "Pią"].map((day, idx) => (
-            <div key={day} className="mb-3">
-              <div className="text-xs text-muted-foreground mb-1">{day}</div>
-              <div className="h-2 rounded-md bg-muted overflow-hidden">
-                <div
-                  className="h-full rounded-md bg-primary/70"
-                  style={{ width: `${[75, 45, 65, 100, 20][idx]}%` }}
-                />
-              </div>
-            </div>
-          ))}
-          <div className="flex items-center justify-between mt-6 text-sm">
-            <span className="text-muted-foreground">Średnio dziennie</span>
-            <span className="font-semibold">1h 45m</span>
-          </div>
-        </div>
-      </section>
+
     </div>
   )
 }

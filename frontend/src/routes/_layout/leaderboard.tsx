@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
-import { Loader2 } from "lucide-react"
+import { Loader2, Trophy, Medal, User } from "lucide-react"
 import { GamesApi } from "@/lib/gameApi"
 
 export const Route = createFileRoute("/_layout/leaderboard")({
@@ -21,57 +21,96 @@ function LeaderboardPage() {
   const topThree = entries.slice(0, 3)
   const rest = entries.slice(3, 10)
 
-  const renderPodium = () => (
-    <div className="flex items-end justify-center gap-6 py-6">
-      {[1, 0, 2].map((idx) => {
-        const entry = topThree[idx]
-        return (
-          <div key={idx} className="flex flex-col items-center gap-3">
-            <div className="text-xs text-muted-foreground uppercase tracking-widest">
-              {MEDALS[idx]}
+  const renderPodium = () => {
+    const p1 = topThree[0]
+    const p2 = topThree[1]
+    const p3 = topThree[2]
+
+    return (
+      <div className="flex items-end justify-center gap-12 py-16 mb-8">
+        {/* 2nd Place */}
+        <div className="flex flex-col items-center group">
+          <div className="relative mb-4">
+            <div className="size-16 rounded-full border-4 border-slate-300 bg-slate-100 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+              <span className="text-2xl font-black text-slate-500">2</span>
             </div>
-            <div className="size-20 rounded-lg bg-muted border border-border flex items-center justify-center">
-              <div className="size-12 rounded-md border-2 border-border bg-card" />
-            </div>
-            <p className="text-xs font-semibold">
-              {entry?.full_name ??
-                entry?.email?.split("@")[0] ??
-                "Tomasz Tomczyk"}
+          </div>
+          <div className="h-24 w-32 bg-slate-200/30 dark:bg-slate-800/50 rounded-t-2xl flex flex-col items-center justify-end pb-4 border-x border-t border-slate-300/30 backdrop-blur-sm shadow-xl">
+            <p className="text-[11px] font-bold text-foreground truncate px-2 max-w-full">
+              {p2?.full_name || p2?.email?.split("@")[0] || "---"}
+            </p>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">
+              {p2?.total_points?.toLocaleString() || 0} XP
             </p>
           </div>
-        )
-      })}
-    </div>
-  )
+        </div>
+
+        {/* 1st Place */}
+        <div className="flex flex-col items-center group -mx-2 z-10 scale-110 -translate-y-4">
+          <div className="relative mb-6">
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 animate-bounce">
+              <Trophy className="size-6 text-yellow-500 fill-yellow-500/20" />
+            </div>
+            <div className="size-20 rounded-full border-4 border-yellow-400 bg-yellow-50 flex items-center justify-center shadow-[0_0_30px_rgba(250,204,21,0.3)] group-hover:scale-105 transition-transform">
+              <span className="text-2xl font-black text-yellow-600">1</span>
+            </div>
+          </div>
+          <div className="h-36 w-36 bg-yellow-400/10 dark:bg-yellow-500/10 rounded-t-2xl flex flex-col items-center justify-end pb-6 border-x border-t border-yellow-400/30 backdrop-blur-md shadow-2xl">
+            <p className="text-xs font-black text-foreground truncate px-2 max-w-full">
+              {p1?.full_name || p1?.email?.split("@")[0] || "---"}
+            </p>
+            <p className="text-[11px] font-black text-yellow-600 uppercase tracking-tighter">
+              {p1?.total_points?.toLocaleString() || 0} XP
+            </p>
+          </div>
+        </div>
+
+        {/* 3rd Place */}
+        <div className="flex flex-col items-center group">
+          <div className="relative mb-4">
+            <div className="size-16 rounded-full border-4 border-amber-600/30 bg-amber-50 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+              <span className="text-2xl font-black text-amber-700">3</span>
+            </div>
+          </div>
+          <div className="h-20 w-32 bg-amber-700/10 dark:bg-amber-900/20 rounded-t-2xl flex flex-col items-center justify-end pb-4 border-x border-t border-amber-700/20 backdrop-blur-sm shadow-xl">
+            <p className="text-[11px] font-bold text-foreground truncate px-2 max-w-full">
+              {p3?.full_name || p3?.email?.split("@")[0] || "---"}
+            </p>
+            <p className="text-[10px] font-black text-amber-700 uppercase tracking-tighter">
+              {p3?.total_points?.toLocaleString() || 0} XP
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const renderRows = () => (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {rest.length > 0 ? (
         rest.map((entry, idx) => (
           <div
             key={entry.id}
-            className="flex items-center justify-between rounded-md bg-muted/60 px-4 py-2 text-sm"
+            className="flex items-center justify-between rounded-xl bg-muted/40 hover:bg-muted/60 px-5 py-4 text-sm transition-colors border border-border/5"
           >
-            <span className="text-xs text-muted-foreground">
-              {idx + 4}. {entry.full_name ?? entry.email.split("@")[0]}
-            </span>
-            <span className="rounded-md bg-card px-3 py-1 text-[11px] font-semibold">
+            <div className="flex items-center gap-4">
+               <span className="size-8 rounded-xl bg-muted flex items-center justify-center text-xs font-black text-muted-foreground shadow-sm border border-border/50">
+                 {idx + 4}
+               </span>
+               <span className="font-bold text-foreground">
+                 {entry.full_name ?? entry.email.split("@")[0]}
+               </span>
+            </div>
+            <span className="rounded-lg bg-primary/10 text-primary px-3 py-1.5 text-xs font-black tracking-tight">
               {entry.total_points.toLocaleString("pl-PL")} XP
             </span>
           </div>
         ))
       ) : (
-        <div className="text-center text-sm text-muted-foreground py-6">
+        <div className="text-center text-sm text-muted-foreground py-12">
           Brak wyników
         </div>
       )}
-      <div className="text-center text-muted-foreground">…</div>
-      <div className="flex items-center justify-between rounded-md bg-muted/60 px-4 py-2 text-sm">
-        <span className="text-xs text-muted-foreground">233123. Your Name</span>
-        <span className="rounded-md bg-card px-3 py-1 text-[11px] font-semibold">
-          120 XP
-        </span>
-      </div>
     </div>
   )
 
@@ -83,20 +122,30 @@ function LeaderboardPage() {
         </div>
       ) : (
         <>
-          <section className="rounded-xl border border-border bg-card shadow-[0_16px_40px_rgba(15,12,24,0.08)] p-8">
-            <h2 className="text-sm font-semibold uppercase tracking-widest">
-              Top 10 Today
-            </h2>
-            {renderPodium()}
-            {renderRows()}
-          </section>
+          <section className="rounded-2xl border border-border bg-card/50 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-10 overflow-hidden relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-30" />
+            
+            <div className="flex flex-col items-center mb-10 text-center">
+               <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
+                  <Trophy className="size-6" />
+               </div>
+               <h2 className="text-3xl font-black text-foreground tracking-tight">
+                 Ranking Mistrzów
+               </h2>
+               <p className="text-sm text-muted-foreground mt-2">
+                 Najlepsi uczniowie w krainie wiedzy
+               </p>
+            </div>
 
-          <section className="rounded-xl border border-border bg-card shadow-[0_16px_40px_rgba(15,12,24,0.08)] p-8">
-            <h2 className="text-sm font-semibold uppercase tracking-widest">
-              Top 10 All-Time
-            </h2>
             {renderPodium()}
-            {renderRows()}
+            
+            <div className="max-w-2xl mx-auto">
+               <div className="flex items-center gap-2 mb-4 px-4">
+                  <Medal className="size-4 text-muted-foreground" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Top 10 Uczniów</span>
+               </div>
+               {renderRows()}
+            </div>
           </section>
         </>
       )}
