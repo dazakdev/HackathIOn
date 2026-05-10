@@ -49,6 +49,6 @@ export const useGameStore = create<GameStore>()(
           quizAnswers: {},
         }),
     }),
-    { name: "sensai-game-state" },
+    { name: "treneiro-game-state" },
   ),
 )

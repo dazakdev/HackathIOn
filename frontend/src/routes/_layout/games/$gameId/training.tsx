@@ -23,7 +23,7 @@ import { useGameStore } from "@/stores/gameStore"
 
 export const Route = createFileRoute("/_layout/games/$gameId/training")({
   component: TrainingPage,
-  head: () => ({ meta: [{ title: "Trening - Sensai" }] }),
+  head: () => ({ meta: [{ title: "Trening - Treneiro" }] }),
 })
 
 function ChatMessage({
