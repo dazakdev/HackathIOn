@@ -6,9 +6,10 @@ import {
   FolderOpen,
   Loader2,
   ShieldAlert,
+  Upload,
   Zap,
 } from "lucide-react"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { toast } from "sonner"
 import { Logo } from "@/components/Common/Logo"
 import { Button } from "@/components/ui/button"
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/_layout/games/new")({
 function NewGame() {
   const navigate = useNavigate()
   const setGame = useGameStore((s) => s.setGame)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Game state
   const [title, setTitle] = useState("")
@@ -37,6 +39,44 @@ function NewGame() {
   const [text, setText] = useState("")
   const [difficulty, setDifficulty] = useState("easy")
   const [selectedIcon, setSelectedIcon] = useState("sparkles")
+  const [isDragging, setIsDragging] = useState(false)
+
+  const processFile = (file: File) => {
+    if (!file.name.endsWith(".txt")) {
+      toast.error("Proszę wybrać plik .txt")
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const content = event.target?.result as string
+      setText(content)
+      toast.success("Plik wczytany pomyślnie!")
+    }
+    reader.readAsText(file)
+  }
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) processFile(file)
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    const file = e.dataTransfer.files?.[0]
+    if (file) processFile(file)
+  }
 
   const { mutate, isPending } = useMutation({
     mutationFn: ({
@@ -56,8 +96,28 @@ function NewGame() {
   })
 
   return (
-    <div className="min-h-svh relative bg-[url('/background.jpg')] bg-cover bg-center">
-      <div className="absolute inset-0 bg-[#8e89a8]/80 dark:bg-black/70" />
+    <div
+      className="min-h-svh relative bg-[url('/background.jpg')] bg-cover bg-center"
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      <div className="absolute inset-0 bg-[#8e89a8]/80 dark:bg-black/70 transition-colors duration-300" />
+
+      {/* Drag & Drop Overlay */}
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-300 pointer-events-none ${
+          isDragging ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <div className="flex flex-col items-center gap-4 text-white">
+          <div className="size-20 rounded-full bg-primary/20 flex items-center justify-center border-2 border-dashed border-primary animate-pulse">
+            <Upload className="h-10 w-10 text-primary" />
+          </div>
+          <p className="text-2xl font-bold">Upuść plik tutaj</p>
+          <p className="text-white/60">Obsługujemy tylko format .txt</p>
+        </div>
+      </div>
 
       <div className="relative z-10 flex flex-col items-center px-6 pb-16">
         <div className="w-full max-w-5xl pt-8">
@@ -83,8 +143,26 @@ function NewGame() {
 
         <div className="w-full max-w-2xl mt-10 space-y-6">
           <section className="rounded-lg bg-card/90 dark:bg-[#2f2f2f]/80 border border-white/30 dark:border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.25)]">
-            <div className="px-6 py-4 flex items-center gap-2 text-sm font-semibold">
-              <FolderOpen className="h-4 w-4" /> Materiał Źródłowy
+            <div className="px-6 py-4 flex items-center justify-between text-sm font-semibold">
+              <div className="flex items-center gap-2">
+                <FolderOpen className="h-4 w-4" /> Materiał Źródłowy
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 gap-2 text-xs hover:bg-primary/10"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isPending}
+              >
+                <Upload className="h-3 w-3" /> Wgraj plik .txt
+              </Button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept=".txt"
+                onChange={handleFileUpload}
+              />
             </div>
             <div className="px-6 pb-6">
               <textarea

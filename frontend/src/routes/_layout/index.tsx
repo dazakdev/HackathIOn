@@ -11,6 +11,18 @@ const ICON_MAP: Record<string, string> = {
   sparkles: "✨",
   brain: "🧠",
 }
+
+const DIFFICULTY_MAP: Record<string, string> = {
+  easy: "Uczeń",
+  medium: "Czeladnik",
+  hard: "Mistrz",
+}
+
+const DIFFICULTY_COLOR_MAP: Record<string, string> = {
+  easy: "bg-green-500/10 text-green-500 border-green-500/20",
+  medium: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
+  hard: "bg-red-500/10 text-red-500 border-red-500/20",
+}
 export const Route = createFileRoute("/_layout/")({
   component: Dashboard,
   head: () => ({ meta: [{ title: "Dashboard - Sensai" }] }),
@@ -122,49 +134,84 @@ function Dashboard() {
           </div>
         ) : (
           <div className="flex gap-6 overflow-x-auto py-4 -mx-1 px-1 snap-x">
-            {active.map((g) => (
-              <Link
-                key={g.id}
-                to={
-                  g.reading_progress >= 100
-                    ? "/games/$gameId/training"
-                    : "/games/$gameId/quiz"
-                }
-                params={{ gameId: g.id }}
-                className="min-w-[320px] max-w-[320px] snap-start group"
-              >
-                <div className="h-full rounded-lg border border-border bg-card shadow-lg p-6 transition-all duration-200 group-hover:shadow-lg group-hover:border-primary/40 group-hover:-translate-y-1">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="size-9 rounded-md bg-muted flex items-center justify-center transition-colors group-hover:bg-primary/10 text-lg">
-                      {ICON_MAP[g.icon] ?? "✨"}
+            {active.map((g) => {
+              const localProgress = localStorage.getItem(
+                `training_progress_${g.id}`,
+              )
+              const trainingInfo = localProgress
+                ? JSON.parse(localProgress)
+                : null
+              const isTraining = g.reading_progress >= 100
+
+              return (
+                <Link
+                  key={g.id}
+                  to={isTraining ? "/games/$gameId/training" : "/games/$gameId/quiz"}
+                  params={{ gameId: g.id }}
+                  className="min-w-[320px] max-w-[320px] snap-start group"
+                >
+                  <div className="h-full rounded-lg border border-border bg-card shadow-lg p-6 transition-all duration-200 group-hover:shadow-lg group-hover:border-primary/40 group-hover:-translate-y-1">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="size-9 rounded-md bg-muted flex items-center justify-center transition-colors group-hover:bg-primary/10 text-lg">
+                        {ICON_MAP[g.icon] ?? "✨"}
+                      </div>
+                      <div className="flex gap-2">
+                        <span
+                          className={`text-[11px] uppercase tracking-widest px-3 py-1 rounded-md font-bold border ${DIFFICULTY_COLOR_MAP[g.difficulty ?? "medium"]}`}
+                        >
+                          {DIFFICULTY_MAP[g.difficulty ?? "medium"]}
+                        </span>
+                        <span className="text-[11px] uppercase tracking-widest bg-muted px-3 py-1 rounded-md text-muted-foreground font-medium">
+                          {isTraining ? "Trening" : "Quiz"}
+                        </span>
+                      </div>
                     </div>
-                    <span className="text-[11px] uppercase tracking-widest bg-muted px-3 py-1 rounded-md text-muted-foreground">
-                      {g.reading_progress >= 100 ? "Trening" : "Quiz"}
-                    </span>
+                    <h3 className="text-lg font-semibold leading-snug group-hover:text-primary transition-colors">
+                      {g.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                      {isTraining
+                        ? "Podczas trenowania ucznia"
+                        : g.reading_progress === 0
+                          ? "Uczeń gotowy do nauki"
+                          : "Kontynuuj swoją przygodę edukacyjną."}
+                    </p>
+                    <div className="mt-6 space-y-2">
+                      <div className="flex items-center justify-between text-[11px] text-muted-foreground font-bold">
+                        <span>
+                          {isTraining
+                            ? trainingInfo
+                              ? `Pytania: ${trainingInfo.answered}/${trainingInfo.total}`
+                              : "Gotowy do walki"
+                            : g.reading_progress === 0
+                              ? "Gotowy do nauki"
+                              : "Postęp"}
+                        </span>
+                        <span className={isTraining ? "text-primary" : ""}>
+                          {isTraining
+                            ? trainingInfo
+                              ? `${Math.round((trainingInfo.answered / trainingInfo.total) * 100)}%`
+                              : "W TOKU"
+                            : `${Math.min(g.reading_progress ?? 0, 100)}%`}
+                        </span>
+                      </div>
+                      <div className="h-2 rounded-md bg-muted overflow-hidden">
+                        <div
+                          className="h-full rounded-md bg-primary/80 transition-all duration-500"
+                          style={{
+                            width: isTraining
+                              ? trainingInfo
+                                ? `${(trainingInfo.answered / trainingInfo.total) * 100}%`
+                                : "100%"
+                              : `${Math.min(g.reading_progress ?? 0, 100)}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-semibold leading-snug group-hover:text-primary transition-colors">
-                    {g.title}
-                  </h3>
-                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                    Kontynuuj swoją przygodę edukacyjną.
-                  </p>
-                  <div className="mt-6 space-y-2">
-                    <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                      <span>Postęp</span>
-                      <span>{Math.min(g.reading_progress ?? 0, 100)}%</span>
-                    </div>
-                    <div className="h-2 rounded-md bg-muted overflow-hidden">
-                      <div
-                        className="h-full rounded-md bg-primary/80 transition-all duration-500"
-                        style={{
-                          width: `${Math.min(g.reading_progress ?? 0, 100)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              )
+            })}
           </div>
         )}
       </section>
@@ -185,8 +232,8 @@ function Dashboard() {
                     <div className="size-9 rounded-md bg-primary/10 flex items-center justify-center text-lg">
                       {ICON_MAP[g.icon] ?? "✨"}
                     </div>
-                    <span className="text-[10px] uppercase tracking-widest bg-green-500/5 px-2.5 py-1 rounded-md text-green-500/70 font-medium border border-green-500/10">
-                      Ukończono
+                    <span className={`text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-md font-bold border ${DIFFICULTY_COLOR_MAP[g.difficulty ?? "medium"]}`}>
+                      {DIFFICULTY_MAP[g.difficulty ?? "medium"]}
                     </span>
                   </div>
                   <h3 className="text-lg font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-1">
