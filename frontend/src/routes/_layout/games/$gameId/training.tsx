@@ -132,6 +132,15 @@ function TrainingPage() {
   })
 
   useEffect(() => {
+    if (total > 0) {
+      localStorage.setItem(
+        `training_progress_${gameId}`,
+        JSON.stringify({ answered, total }),
+      )
+    }
+  }, [gameId, answered, total])
+
+  useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
