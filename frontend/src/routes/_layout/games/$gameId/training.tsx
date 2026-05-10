@@ -147,8 +147,10 @@ function TrainingPage() {
 
   useEffect(() => {
     if (total > 0) {
-      const prog = Math.round((answered / total) * 100)
-      localStorage.setItem(`training_progress_${gameId}`, prog.toString())
+      localStorage.setItem(
+        `training_progress_${gameId}`,
+        JSON.stringify({ answered, total }),
+      )
     }
   }, [answered, total, gameId])
 
@@ -173,17 +175,6 @@ function TrainingPage() {
       )
     },
   })
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background gap-4">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <span className="text-muted-foreground font-medium text-lg">
-          Przygotowuję sesję treningową…
-        </span>
-      </div>
-    )
-  }
 
   const toggleTheme = () => {
     setTheme(resolvedTheme === "dark" ? "light" : "dark")
@@ -318,26 +309,39 @@ function TrainingPage() {
           ref={scrollRef}
           className="flex-1 overflow-y-auto p-10 space-y-4 scroll-smooth z-0"
         >
-          {displayQuestions.map((q, idx) => {
-            if (q.score === null && q.id !== currentQuestion?.id) return null
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center h-full gap-4">
+              <Loader2 className="h-10 w-10 animate-spin text-primary" />
+              <span className="text-muted-foreground font-medium">
+                Przygotowuję sesję treningową…
+              </span>
+            </div>
+          ) : (
+            displayQuestions.map((q, idx) => {
+              if (q.score === null && q.id !== currentQuestion?.id) return null
 
-            return (
-              <div key={q.id} className="mb-12">
-                <ChatMessage userRole="student">
-                  <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-primary">
-                    Pytanie od ucznia {idx + 1}
-                  </div>
-                  <p className="text-base leading-relaxed">{q.question_text}</p>
-                </ChatMessage>
-
-                {q.user_answer && (
-                  <ChatMessage userRole="treneiro">
-                    <p className="text-base leading-relaxed">{q.user_answer}</p>
+              return (
+                <div key={q.id} className="mb-12">
+                  <ChatMessage userRole="student">
+                    <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-primary">
+                      Pytanie od ucznia {idx + 1}
+                    </div>
+                    <p className="text-base leading-relaxed">
+                      {q.question_text}
+                    </p>
                   </ChatMessage>
-                )}
-              </div>
-            )
-          })}
+
+                  {q.user_answer && (
+                    <ChatMessage userRole="treneiro">
+                      <p className="text-base leading-relaxed">
+                        {q.user_answer}
+                      </p>
+                    </ChatMessage>
+                  )}
+                </div>
+              )
+            })
+          )}
 
           {isPending && (
             <ChatMessage userRole="system" isSystem>

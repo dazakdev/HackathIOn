@@ -139,9 +139,20 @@ function Dashboard() {
               const localProgress = localStorage.getItem(
                 `training_progress_${g.id}`,
               )
-              const trainingInfo = localProgress
-                ? JSON.parse(localProgress)
-                : null
+              let trainingInfo = null
+              if (localProgress) {
+                try {
+                  const parsed = JSON.parse(localProgress)
+                  if (typeof parsed === "object") {
+                    trainingInfo = parsed
+                  } else {
+                    // Handle old format (plain number)
+                    trainingInfo = { answered: 0, total: 3 }
+                  }
+                } catch {
+                  trainingInfo = { answered: 0, total: 3 }
+                }
+              }
               const isTraining = g.reading_progress >= 100
 
               return (
@@ -187,7 +198,7 @@ function Dashboard() {
                           {isTraining
                             ? trainingInfo
                               ? `Pytania: ${trainingInfo.answered}/${trainingInfo.total}`
-                              : "Gotowy do walki"
+                              : "Trening w toku"
                             : g.reading_progress === 0
                               ? "Gotowy do nauki"
                               : "Postęp"}
@@ -196,7 +207,7 @@ function Dashboard() {
                           {isTraining
                             ? trainingInfo
                               ? `${Math.round((trainingInfo.answered / trainingInfo.total) * 100)}%`
-                              : "W TOKU"
+                              : "0%"
                             : `${Math.min(g.reading_progress ?? 0, 100)}%`}
                         </span>
                       </div>
@@ -207,7 +218,7 @@ function Dashboard() {
                             width: isTraining
                               ? trainingInfo
                                 ? `${(trainingInfo.answered / trainingInfo.total) * 100}%`
-                                : "100%"
+                                : "0%"
                               : `${Math.min(g.reading_progress ?? 0, 100)}%`,
                           }}
                         />
