@@ -88,6 +88,11 @@ function TrainingPage() {
   const [currentAnswer, setCurrentAnswer] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  const { data: game } = useQuery({
+    queryKey: ["game", gameId],
+    queryFn: () => GamesApi.getGame(gameId),
+  })
+
   const { isLoading, data: training } = useQuery({
     queryKey: ["training", gameId],
     queryFn: async () => {
@@ -156,8 +161,8 @@ function TrainingPage() {
     onError: (err: any) => {
       toast.error(
         err?.response?.data?.detail ??
-        err?.message ??
-        "Nie udało się rozpocząć walki",
+          err?.message ??
+          "Nie udało się rozpocząć walki",
       )
     },
   })
@@ -247,7 +252,7 @@ function TrainingPage() {
             </div>
             <div className="flex flex-col">
               <h2 className="font-bold text-foreground leading-tight">
-                Wprowadzenie do Stoicyzmu
+                {game?.title ?? "Ładowanie przygody..."}
               </h2>
               <span className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-bold">
                 Faza 2: Trening Ucznia
@@ -256,6 +261,17 @@ function TrainingPage() {
           </div>
 
           <div className="flex items-center gap-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-[10px] uppercase font-bold tracking-wider gap-2 hover:bg-primary/10"
+              onClick={() =>
+                navigate({ to: "/games/$gameId/quiz", params: { gameId } })
+              }
+            >
+              <BookOpen className="h-3 w-3" /> Pokaż materiał
+            </Button>
+            <div className="h-10 w-px bg-border" />
             <div className="flex flex-col items-end gap-1.5">
               <div className="flex items-center justify-between w-48 text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
                 <span>Postęp</span>

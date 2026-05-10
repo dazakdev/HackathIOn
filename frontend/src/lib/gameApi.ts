@@ -120,14 +120,18 @@ export interface LeaderboardEntry {
 export const GamesApi = {
   createGame: (
     source_text: string,
-    difficulty: string = "medium",
-    icon: string = "✨",
+    difficulty: string,
+    icon: string,
+    title?: string,
+    description?: string,
   ) =>
     api
-      .post<GameDetail & { questions: QuizQuestionData[] }>("/games/", {
+      .post<GameDetail>("/games/", {
         source_text,
         difficulty,
         icon,
+        title,
+        description,
       })
       .then((r) => r.data),
 
@@ -158,6 +162,9 @@ export const GamesApi = {
 
   getQuizResults: (id: string) =>
     api.get<QuizResultsData>(`/games/${id}/quiz/results`).then((r) => r.data),
+
+  resetQuiz: (id: string) =>
+    api.post(`/games/${id}/quiz/reset`).then((r) => r.data),
 
   startTraining: (id: string) =>
     api

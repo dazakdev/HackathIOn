@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import useAuth from "@/hooks/useAuth"
 import { GamesApi } from "@/lib/gameApi"
+
 const ICON_MAP: Record<string, string> = {
   zap: "⚡",
   sparkles: "✨",
@@ -146,7 +147,11 @@ function Dashboard() {
               return (
                 <Link
                   key={g.id}
-                  to={isTraining ? "/games/$gameId/training" : "/games/$gameId/quiz"}
+                  to={
+                    isTraining
+                      ? "/games/$gameId/training"
+                      : "/games/$gameId/quiz"
+                  }
                   params={{ gameId: g.id }}
                   className="min-w-[320px] max-w-[320px] snap-start group"
                 >
@@ -232,7 +237,9 @@ function Dashboard() {
                     <div className="size-9 rounded-md bg-primary/10 flex items-center justify-center text-lg">
                       {ICON_MAP[g.icon] ?? "✨"}
                     </div>
-                    <span className={`text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-md font-bold border ${DIFFICULTY_COLOR_MAP[g.difficulty ?? "medium"]}`}>
+                    <span
+                      className={`text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-md font-bold border ${DIFFICULTY_COLOR_MAP[g.difficulty ?? "medium"]}`}
+                    >
                       {DIFFICULTY_MAP[g.difficulty ?? "medium"]}
                     </span>
                   </div>

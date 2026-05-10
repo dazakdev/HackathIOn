@@ -1,13 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import {
-  CheckCircle,
-  ChevronRight,
-  Loader2,
-  Moon,
-  Sun,
-  X,
-} from "lucide-react"
+import { CheckCircle, ChevronRight, Loader2, Moon, Sun, X } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { useTheme } from "@/components/theme-provider"
@@ -215,6 +208,7 @@ function QuizPage() {
 
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [allAnswered, setAllAnswered] = useState(false)
+  const [resetCount, setResetCount] = useState(0)
   const sourceRef = useRef<HTMLDivElement>(null)
   const saveProgressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -248,6 +242,37 @@ function QuizPage() {
     }, 500)
   }, [gameId, setReadingProgress])
 
+  const { mutate: startTraining, isPending: isStartingTraining } = useMutation({
+    mutationFn: () => GamesApi.startTraining(gameId),
+    onSuccess: () => {
+      setPhase("training")
+      queryClient.invalidateQueries({ queryKey: ["games"] })
+      queryClient.invalidateQueries({ queryKey: ["quiz", gameId] })
+      toast.success("Quiz ukończony! Zaczynamy trening.")
+      navigate({ to: "/games/$gameId/training", params: { gameId } })
+    },
+    onError: (err: any) => {
+      const msg =
+        err?.response?.data?.detail ?? "Błąd podczas rozpoczynania treningu"
+      toast.error(msg)
+      queryClient.invalidateQueries({ queryKey: ["quiz", gameId] })
+      setCurrentQuestion(0)
+      setAllAnswered(false)
+    },
+  })
+
+  const { mutate: resetQuiz, isPending: isResetting } = useMutation({
+    mutationFn: () => GamesApi.resetQuiz(gameId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["quiz", gameId] })
+      setCurrentQuestion(0)
+      setAllAnswered(false)
+      setResetCount((p) => p + 1)
+      toast.info("Zaczynamy od początku!")
+      window.location.reload()
+    },
+  })
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh] gap-3">
@@ -262,21 +287,16 @@ function QuizPage() {
   if (!quiz) return null
 
   const questions = quiz.questions ?? []
+  const goToTraining = () => startTraining()
   const q = questions[currentQuestion]
 
-  const goToTraining = async () => {
-    setPhase("training")
-    toast.success("Quiz ukończony! Zaczynamy trening.")
-    await GamesApi.startTraining(gameId)
-    queryClient.invalidateQueries({ queryKey: ["games"] })
-    navigate({ to: "/games/$gameId/training", params: { gameId } })
-  }
-
   const answeredCount = Object.keys(quiz.answers ?? {}).length
+  const correctCount = Object.values(quiz.answers ?? {}).filter(
+    (a: any) => a.is_correct,
+  ).length
+  const isPerfect = correctCount === questions.length && questions.length > 0
   const progressPercent =
-    questions.length > 0
-      ? Math.round((answeredCount / questions.length) * 100)
-      : 0
+    questions.length > 0 ? Math.round((answeredCount / questions.length) * 100) : 0
 
   return (
     <div className="min-h-svh bg-[url('/background.jpg')] bg-cover bg-center relative">
@@ -354,7 +374,7 @@ function QuizPage() {
                     : "Sprawdź wiedzę"}
                 </div>
 
-                {quiz.status === "training_ready" ? (
+                {quiz.status === "training_ready" || (allAnswered && isPerfect) ? (
                   <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4 py-10">
                     <div className="size-16 rounded-full bg-green-500/20 flex items-center justify-center text-green-500 mb-2">
                       <CheckCircle className="h-8 w-8" />
@@ -371,7 +391,7 @@ function QuizPage() {
                 ) : (
                   q && (
                     <QuestionCard
-                      key={q.id}
+                      key={`${q.id}-${resetCount}`}
                       question={q}
                       existingAnswer={quiz.answers?.[q.id] as any}
                       onAnswered={(done) => {
@@ -388,15 +408,38 @@ function QuizPage() {
               </div>
 
               <div className="pt-6">
-                {allAnswered || quiz.status === "training_ready" ? (
-                  <Button
-                    size="lg"
-                    className="w-full rounded-lg font-semibold bg-white text-black hover:bg-white/90"
-                    onClick={goToTraining}
-                  >
-                    Przejdź do treningu{" "}
-                    <ChevronRight className="ml-2 h-4 w-4" />
-                  </Button>
+                {allAnswered ? (
+                  isPerfect ? (
+                    <Button
+                      size="lg"
+                      className="w-full rounded-lg font-semibold bg-white text-black hover:bg-white/90"
+                      onClick={goToTraining}
+                      disabled={isStartingTraining}
+                    >
+                      {isStartingTraining ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          Przejdź do treningu{" "}
+                          <ChevronRight className="ml-2 h-4 w-4" />
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="destructive"
+                      size="lg"
+                      className="w-full rounded-lg font-semibold"
+                      onClick={() => resetQuiz()}
+                      disabled={isResetting}
+                    >
+                      {isResetting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        `Spróbuj ponownie (${correctCount}/${questions.length})`
+                      )}
+                    </Button>
+                  )
                 ) : (
                   <Button
                     className="w-full rounded-lg font-semibold bg-white text-black hover:bg-white/90"
@@ -405,7 +448,7 @@ function QuizPage() {
                         Math.min(questions.length - 1, p + 1),
                       )
                     }
-                    disabled={!quiz.answers?.[q.id]}
+                    disabled={!quiz.answers?.[q?.id]}
                   >
                     Kolejne pytanie
                   </Button>

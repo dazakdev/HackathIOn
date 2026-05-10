@@ -13,6 +13,8 @@ def create_game_with_mcq(
     session: Session,
     user_id: uuid.UUID,
     text: str,
+    title: str | None = None,
+    description: str | None = None,
     question_count: int | None = None,
     difficulty: str = "medium",
     icon: str = "sparkles",
@@ -20,7 +22,8 @@ def create_game_with_mcq(
     quiz = generate_mcq_quiz(text, question_count=question_count)
     game = Game(
         user_id=user_id,
-        title=quiz.title,
+        title=title or quiz.title,
+        description=description or "",
         source_text=text,
         reading_progress=0,
         status="quiz_ready",

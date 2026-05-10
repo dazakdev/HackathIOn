@@ -83,8 +83,15 @@ function NewGame() {
       text,
       difficulty,
       icon,
-    }: { text: string; difficulty: string; icon: string }) =>
-      GamesApi.createGame(text, difficulty, icon),
+      title,
+      description,
+    }: {
+      text: string
+      difficulty: string
+      icon: string
+      title?: string
+      description?: string
+    }) => GamesApi.createGame(text, difficulty, icon, title, description),
     onSuccess: (data) => {
       setGame(data.id, "quiz")
       toast.success("Gra utworzona! Quiz gotowy.")
@@ -304,7 +311,13 @@ function NewGame() {
             className="rounded-lg px-10 py-6 text-base font-semibold shadow-xl"
             disabled={isPending || text.trim().length < 80}
             onClick={() =>
-              mutate({ text: text.trim(), difficulty, icon: selectedIcon })
+              mutate({
+                text: text.trim(),
+                difficulty,
+                icon: selectedIcon,
+                title: title.trim() || undefined,
+                description: description.trim() || undefined,
+              })
             }
           >
             {isPending ? (

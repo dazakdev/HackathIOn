@@ -35,6 +35,8 @@ router = APIRouter(tags=["games"])
 
 class GameCreateRequest(BaseModel):
     source_text: str
+    title: str | None = None
+    description: str | None = None
     difficulty: str = "medium"
     icon: str = "sparkles"
 
@@ -149,6 +151,8 @@ def create_game(
         session=session,
         user_id=current_user.id,
         text=body.source_text,
+        title=body.title,
+        description=body.description,
         difficulty=body.difficulty,
         icon=body.icon,
     )
@@ -298,6 +302,31 @@ def submit_quiz_answer(
     }
 
 
+@router.post("/{game_id}/quiz/reset")
+def reset_quiz(
+    game_id: uuid.UUID,
+    session: SessionDep,
+    current_user: CurrentUser,
+) -> dict[str, str]:
+    _get_game(session, game_id, current_user)
+    
+    stmt = select(QuizAnswer).where(
+        QuizAnswer.game_id == game_id,
+        QuizAnswer.user_id == current_user.id
+    )
+    answers = session.exec(stmt).all()
+    for a in answers:
+        session.delete(a)
+    
+    game = session.get(Game, game_id)
+    if game:
+        game.status = "quiz_ready"
+        session.add(game)
+        
+    session.commit()
+    return {"message": "Quiz reset successfully"}
+
+
 @router.get("/{game_id}/quiz/results")
 def get_quiz_results(
     game_id: uuid.UUID,
@@ -346,6 +375,31 @@ def start_training(
     current_user: CurrentUser,
 ) -> dict[str, Any]:
     game = _get_game(session, game_id, current_user)
+
+    # Validate quiz results before allowing training
+    answers_stmt = select(QuizAnswer).where(
+        QuizAnswer.game_id == game_id,
+        QuizAnswer.user_id == current_user.id,
+    )
+    answers = list(session.exec(answers_stmt).all())
+    correct_count = sum(1 for a in answers if a.is_correct)
+
+    questions_count_stmt = select(func.count()).select_from(QuizQuestion).where(
+        QuizQuestion.game_id == game_id
+    )
+    total_questions = session.exec(questions_count_stmt).one()
+
+    if correct_count < total_questions:
+        # User must repeat the quiz. Delete answers to reset.
+        for a in answers:
+            session.delete(a)
+        game.status = "quiz_ready"
+        session.add(game)
+        session.commit()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Musisz mieć 100% poprawnych odpowiedzi ({total_questions}/{total_questions}), aby przejść dalej. Twój wynik: {correct_count}/{total_questions}. Spróbuj jeszcze raz!",
+        )
 
     # Idempotent: return existing active session if present
     existing_stmt = (
