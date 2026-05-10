@@ -27,25 +27,6 @@ export const Route = createFileRoute("/_layout/games/$gameId/training")({
   head: () => ({ meta: [{ title: "Trening - Sensai" }] }),
 })
 
-function _ScoreIndicator({ score }: { score: number }) {
-  const color =
-    score >= 80
-      ? "text-green-500 bg-green-500/10"
-      : score >= 60
-        ? "text-yellow-500 bg-yellow-500/10"
-        : score >= 40
-          ? "text-orange-500 bg-orange-500/10"
-          : "text-red-500 bg-red-500/10"
-
-  return (
-    <div
-      className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-bold ${color}`}
-    >
-      <Award className="h-3.5 w-3.5" />
-      <span>{score}/100</span>
-    </div>
-  )
-}
 
 function ChatMessage({
   role,
@@ -289,7 +270,7 @@ function TrainingPage() {
 
             return (
               <div key={q.id} className="mb-12">
-                <ChatMessage>
+                <ChatMessage role="student">
                   <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-primary">
                     Pytanie od ucznia {idx + 1}
                   </div>
@@ -297,7 +278,7 @@ function TrainingPage() {
                 </ChatMessage>
 
                 {q.user_answer && (
-                  <ChatMessage>
+                  <ChatMessage role="sensai">
                     <p className="text-base leading-relaxed">{q.user_answer}</p>
                   </ChatMessage>
                 )}
@@ -306,7 +287,7 @@ function TrainingPage() {
           })}
 
           {isPending && (
-            <ChatMessage>
+            <ChatMessage role="system" isSystem>
               <div className="flex items-center gap-3 py-2">
                 <Loader2 className="h-5 w-5 animate-spin text-primary" />
                 <span className="font-medium text-muted-foreground">
