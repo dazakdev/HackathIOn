@@ -211,6 +211,7 @@ function QuizPage() {
   const [resetCount, setResetCount] = useState(0)
   const sourceRef = useRef<HTMLDivElement>(null)
   const saveProgressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const hasInitializedRef = useRef(false)
 
   const { data: quiz, isLoading } = useQuery({
     queryKey: ["quiz", gameId],
@@ -225,12 +226,15 @@ function QuizPage() {
     const allDone = answeredKeys.length >= questions.length
     setAllAnswered(allDone)
 
-    // Resume from the first unanswered question
-    const firstUnansweredIndex = questions.findIndex((q) => !answers[q.id])
-    if (firstUnansweredIndex !== -1) {
-      setCurrentQuestion(firstUnansweredIndex)
-    } else if (allDone && questions.length > 0) {
-      setCurrentQuestion(questions.length - 1)
+    // Resume from the first unanswered question ONLY ONCE
+    if (!hasInitializedRef.current) {
+      const firstUnansweredIndex = questions.findIndex((q) => !answers[q.id])
+      if (firstUnansweredIndex !== -1) {
+        setCurrentQuestion(firstUnansweredIndex)
+      } else if (allDone && questions.length > 0) {
+        setCurrentQuestion(questions.length - 1)
+      }
+      hasInitializedRef.current = true
     }
   }, [quiz])
 
