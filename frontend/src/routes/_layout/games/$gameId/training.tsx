@@ -32,13 +32,13 @@ function ChatMessage({
   isSystem = false,
   children,
 }: {
-  userRole: "student" | "sensai" | "system"
+  userRole: "student" | "treneiro" | "system"
   content?: string
   isSystem?: boolean
   children?: React.ReactNode
 }) {
   const isStudent = userRole === "student"
-  const isSensai = userRole === "sensai"
+  const isTreneiro = userRole === "treneiro"
 
   if (isSystem) {
     return (
@@ -52,7 +52,7 @@ function ChatMessage({
 
   return (
     <div
-      className={`flex gap-4 my-6 w-full ${isSensai ? "flex-row-reverse" : ""}`}
+      className={`flex gap-4 my-6 w-full ${isTreneiro ? "flex-row-reverse" : ""}`}
     >
       <div
         className={`shrink-0 size-10 rounded-md flex items-center justify-center ${isStudent ? "bg-muted border border-border" : "bg-primary border border-primary/20"}`}
@@ -63,9 +63,9 @@ function ChatMessage({
           <User className="h-4 w-4 text-primary-foreground" />
         )}
       </div>
-      <div className={`max-w-[70%] ${isSensai ? "text-right" : "text-left"}`}>
+      <div className={`max-w-[70%] ${isTreneiro ? "text-right" : "text-left"}`}>
         <div
-          className={`inline-block rounded-lg px-4 py-3 text-sm shadow-xl ${isSensai ? "bg-card text-card-foreground border border-border" : "bg-muted/50 border border-border text-foreground"}`}
+          className={`inline-block rounded-lg px-4 py-3 text-sm shadow-xl ${isTreneiro ? "bg-card text-card-foreground border border-border" : "bg-muted/50 border border-border text-foreground"}`}
         >
           {content}
           {children}
@@ -137,13 +137,20 @@ function TrainingPage() {
   })
 
   useEffect(() => {
-    if (total > 0) {
-      localStorage.setItem(
-        `training_progress_${gameId}`,
-        JSON.stringify({ answered, total }),
-      )
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth",
+      })
     }
-  }, [gameId, answered, total])
+  }, [displayQuestions, isPending])
+
+  useEffect(() => {
+    if (total > 0) {
+      const prog = Math.round((answered / total) * 100)
+      localStorage.setItem(`training_progress_${gameId}`, prog.toString())
+    }
+  }, [answered, total, gameId])
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -324,7 +331,7 @@ function TrainingPage() {
                 </ChatMessage>
 
                 {q.user_answer && (
-                  <ChatMessage userRole="sensai">
+                  <ChatMessage userRole="treneiro">
                     <p className="text-base leading-relaxed">{q.user_answer}</p>
                   </ChatMessage>
                 )}

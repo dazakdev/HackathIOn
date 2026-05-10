@@ -9,7 +9,7 @@ from app.llm.mcq import generate_mcq_quiz
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate Sensai MCQ quiz with Ollama.")
+    parser = argparse.ArgumentParser(description="Generate Treneiro MCQ quiz with Ollama.")
     parser.add_argument("file", type=Path, help="Path to a UTF-8 text file.")
     parser.add_argument(
         "--questions",

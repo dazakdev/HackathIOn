@@ -4,7 +4,7 @@ from sqlmodel import Session, col, func, select
 
 from app.llm.training import (
     TrainingDifficulty,
-    evaluate_sensei_answer,
+    evaluate_treneiro_answer,
     generate_student_questions,
 )
 from app.models import (
@@ -64,7 +64,7 @@ def answer_training_question(
     training_question: TrainingQuestion,
     user_answer: str,
 ) -> TrainingQuestion:
-    evaluation = evaluate_sensei_answer(
+    evaluation = evaluate_treneiro_answer(
         source_text=game.source_text,
         question_text=training_question.question_text,
         ideal_answer=training_question.ideal_answer,
