@@ -540,7 +540,6 @@ def get_boss_result(
         "boss_hp_end": boss_battle.boss_hp_end,
         "player_damage_total": boss_battle.player_damage_total,
         "accuracy_avg": boss_battle.accuracy_avg,
-        "combo_count": boss_battle.combo_count,
         "victory": boss_battle.victory,
         "xp_gained": boss_battle.score,
         "completed_at": boss_battle.completed_at,

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { Home, Loader2, Plus, Swords, Award, Target, Zap, Clock3, User, Bot } from "lucide-react"
+import { Home, Loader2, Plus, Swords, Award, Target, Zap, Clock3, User, Bot, BookOpen, Info, CheckCircle, Sun, Moon } from "lucide-react"
 import { GamesApi } from "@/lib/gameApi"
 import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/Common/Logo"
@@ -14,7 +14,11 @@ export const Route = createFileRoute("/_layout/games/$gameId/summary")({
 function SummaryPage() {
    const { gameId } = Route.useParams()
    const navigate = useNavigate()
-   const { resolvedTheme } = useTheme()
+   const { resolvedTheme, setTheme } = useTheme()
+
+   const toggleTheme = () => {
+      setTheme(resolvedTheme === "dark" ? "light" : "dark")
+   }
 
    const { data: game, isLoading: gameLoading } = useQuery({
       queryKey: ["game", gameId],
@@ -26,7 +30,12 @@ function SummaryPage() {
       queryFn: () => GamesApi.getBossResult(gameId),
    })
 
-   if (gameLoading || bossLoading) {
+   const { data: training, isLoading: trainingLoading } = useQuery({
+      queryKey: ["training", gameId],
+      queryFn: () => GamesApi.getTraining(gameId),
+   })
+
+   if (gameLoading || bossLoading || trainingLoading) {
       return (
          <div className="flex flex-col items-center justify-center min-h-screen bg-background gap-4">
             <Loader2 className="h-10 w-10 animate-spin text-primary" />
@@ -36,10 +45,10 @@ function SummaryPage() {
    }
 
    const isVictory = bossResult?.victory ?? false
-   const accuracy = bossResult ? Math.round(bossResult.accuracy_avg * 100) : 0
+   const accuracy = bossResult ? bossResult.accuracy_avg : 0
    const xp = bossResult?.xp_gained ?? 0
    // Actually player doesn't have HP in current model, but let's show student's state
-   const bossHPPercent = bossResult ? Math.max(0, Math.round((bossResult.boss_hp_end / bossResult.boss_hp_start) * 100)) : 0
+
 
    return (
       <div className="fixed inset-0 bg-background flex overflow-hidden">
@@ -85,20 +94,29 @@ function SummaryPage() {
             <div className="absolute inset-0 bg-[url('/background.jpg')] bg-cover bg-center opacity-[0.03] pointer-events-none" />
 
             {/* Header */}
-            <header className="h-20 border-b border-border flex items-center px-10 justify-between bg-background/80 backdrop-blur-md z-10 sticky top-0">
-               <div className="flex items-center gap-4">
-                  <div className={`size-10 rounded-lg flex items-center justify-center ${isVictory ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
-                     <Award className="h-5 w-5" />
+            <header className="h-24 border-b border-border flex items-center px-14 py-4 justify-between bg-background/80 backdrop-blur-md z-10 sticky top-0 shadow-sm">
+               <div className="flex items-center gap-5">
+                  <div className={`size-12 rounded-xl flex items-center justify-center ${isVictory ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
+                     <Award className="h-6 w-6" />
                   </div>
                   <div className="flex flex-col">
-                     <h2 className="font-bold text-foreground leading-tight">{game?.title ?? "Podsumowanie przygody"}</h2>
-                     <span className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-bold">Faza 4: Wynik końcowy</span>
+                     <h2 className="font-black text-xl text-foreground leading-tight tracking-tight">{game?.title ?? "Podsumowanie przygody"}</h2>
+                     <span className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-bold opacity-70">Faza 4: Wynik końcowy</span>
                   </div>
                </div>
 
-               <div className="flex items-center gap-2.5 px-4 py-2 rounded-lg bg-card border border-border">
-                  <Clock3 className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-bold text-foreground font-mono tracking-wider">12:45</span>
+               <div className="flex items-center gap-4">
+                  <button
+                     onClick={toggleTheme}
+                     className="size-10 rounded-xl border border-border bg-card flex items-center justify-center transition-all hover:bg-muted shadow-sm"
+                     title="Zmień motyw"
+                  >
+                     {resolvedTheme === "dark" ? <Sun className="h-4 w-4 text-yellow-400" /> : <Moon className="h-4 w-4 text-primary" />}
+                  </button>
+                  <div className="flex items-center gap-3 px-5 py-2.5 rounded-xl bg-card border border-border">
+                     <Clock3 className="h-4 w-4 text-primary opacity-70" />
+                     <span className="text-base font-black text-foreground font-mono tracking-wider">12:45</span>
+                  </div>
                </div>
             </header>
 
@@ -110,54 +128,10 @@ function SummaryPage() {
                   <p className="text-muted-foreground">Oto szczegółowy raport z bitwy</p>
                </div>
 
-               {/* VS Card */}
-               <div className="w-full max-w-3xl rounded-2xl bg-card border border-border p-8 shadow-2xl relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
 
-                  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-12 relative z-10">
-                     <div className="space-y-4 text-center">
-                        <div className="mx-auto size-20 rounded-xl bg-primary/10 border-2 border-primary/20 flex items-center justify-center">
-                           <User className="h-10 w-10 text-primary" />
-                        </div>
-                        <div>
-                           <p className="font-bold text-foreground">Twój Uczeń</p>
-                           <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Dobra forma</p>
-                        </div>
-                        <div className="space-y-1.5">
-                           <div className="h-2 rounded-full bg-muted overflow-hidden">
-                              <div className="h-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" style={{ width: "100%" }} />
-                           </div>
-                           <p className="text-[10px] font-bold text-green-500 uppercase">HP: 100%</p>
-                        </div>
-                     </div>
-
-                     <div className="flex flex-col items-center gap-3">
-                        <div className="size-14 rounded-full bg-background border border-border flex items-center justify-center shadow-xl">
-                           <Swords className="h-6 w-6 text-muted-foreground" />
-                        </div>
-                        <div className="h-20 w-px bg-gradient-to-b from-transparent via-border to-transparent" />
-                     </div>
-
-                     <div className="space-y-4 text-center">
-                        <div className="mx-auto size-20 rounded-xl bg-red-500/10 border-2 border-red-500/20 flex items-center justify-center">
-                           <Bot className="h-10 w-10 text-red-500" />
-                        </div>
-                        <div>
-                           <p className="font-bold text-foreground">Kwantowy Kolos</p>
-                           <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Przeciwnik</p>
-                        </div>
-                        <div className="space-y-1.5">
-                           <div className="h-2 rounded-full bg-muted overflow-hidden">
-                              <div className="h-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)] transition-all duration-1000" style={{ width: `${bossHPPercent}%` }} />
-                           </div>
-                           <p className="text-[10px] font-bold text-red-500 uppercase tracking-tighter">HP: {bossHPPercent}%</p>
-                        </div>
-                     </div>
-                  </div>
-               </div>
 
                {/* Stats Grid */}
-               <div className="w-full max-w-3xl grid grid-cols-1 md:grid-cols-3 gap-6">
+               <div className="w-full max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-card border border-border p-6 rounded-2xl flex flex-col items-center gap-3 shadow-xl hover:translate-y-[-4px] transition-all">
                      <div className="size-12 rounded-lg bg-yellow-500/10 flex items-center justify-center text-yellow-500">
                         <Target className="h-6 w-6" />
@@ -175,16 +149,6 @@ function SummaryPage() {
                      <div className="text-center">
                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Doświadczenie</p>
                         <p className="text-2xl font-black text-foreground">+{xp} XP</p>
-                     </div>
-                  </div>
-
-                  <div className="bg-card border border-border p-6 rounded-2xl flex flex-col items-center gap-3 shadow-xl hover:translate-y-[-4px] transition-all">
-                     <div className="size-12 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500">
-                        <Zap className="h-6 w-6" />
-                     </div>
-                     <div className="text-center">
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Największe Combo</p>
-                        <p className="text-2xl font-black text-foreground">{bossResult?.combo_count ?? 0}x</p>
                      </div>
                   </div>
                </div>
@@ -207,6 +171,52 @@ function SummaryPage() {
                      <Home className="h-5 w-5" /> Pulpit
                   </Button>
                </div>
+
+               {/* Ideal Answers Section */}
+               {training?.questions && training.questions.length > 0 && (
+                  <div className="w-full max-w-3xl space-y-6 mt-4">
+                     <div className="flex items-center gap-3 px-2">
+                        <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                           <BookOpen className="h-4 w-4" />
+                        </div>
+                        <h3 className="font-bold text-lg text-foreground">Wzorcowe wyjaśnienia</h3>
+                     </div>
+                     
+                     <div className="grid gap-4">
+                        {training.questions.map((q, idx) => (
+                           <div key={q.id} className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+                              <div className="px-6 py-4 bg-muted/30 border-b border-border flex items-center justify-between">
+                                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Pytanie {idx + 1}</span>
+                                 <div className="flex items-center gap-2">
+                                    <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Twoja ocena:</span>
+                                    <span className={`text-xs font-black ${q.score && q.score >= 80 ? "text-green-500" : q.score && q.score >= 50 ? "text-yellow-500" : "text-red-500"}`}>
+                                       {q.score}/100
+                                    </span>
+                                 </div>
+                              </div>
+                              <div className="p-6 space-y-4">
+                                 <p className="text-sm font-semibold text-foreground leading-relaxed">{q.question_text}</p>
+                                 <div className="space-y-3">
+                                    <div className="rounded-xl bg-muted/20 p-4 border border-border/50">
+                                       <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block mb-2 opacity-70">Twoja odpowiedź:</span>
+                                       <p className="text-sm text-foreground/80 leading-relaxed">{q.user_answer || "Brak odpowiedzi"}</p>
+                                    </div>
+                                    {q.ideal_answer && (
+                                       <div className="rounded-xl bg-primary/5 p-4 border border-primary/10">
+                                          <div className="flex items-center gap-2 mb-2">
+                                             <Info className="h-3.5 w-3.5 text-primary opacity-70" />
+                                             <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Wzorcowe wyjaśnienie:</span>
+                                          </div>
+                                          <p className="text-sm text-foreground/90 font-medium leading-relaxed italic">"{q.ideal_answer}"</p>
+                                      </div>
+                                    )}
+                                 </div>
+                              </div>
+                           </div>
+                        ))}
+                     </div>
+                  </div>
+               )}
             </div>
          </main>
       </div>

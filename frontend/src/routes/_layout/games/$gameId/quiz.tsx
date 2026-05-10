@@ -115,9 +115,9 @@ function QuestionCard({
           "{result.explanation}"
         </div>
         <Button
-          variant="outline"
+          variant="secondary"
           size="sm"
-          className="text-xs font-bold uppercase tracking-wider"
+          className="text-xs font-bold uppercase tracking-wider border border-primary/20 hover:bg-primary/10 transition-colors"
           onClick={() => setShowExplanation(false)}
         >
           Powrót do pytania
@@ -172,7 +172,7 @@ function QuestionCard({
           {result.explanation && (
             <button
               onClick={() => setShowExplanation(true)}
-              className="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline flex items-center gap-1.5 px-1"
+              className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary bg-primary/10 hover:bg-primary/20 border border-primary/20 rounded-md px-3 py-1.5 transition-all flex items-center gap-1.5 w-fit"
             >
               Zobacz wyjaśnienie <ChevronRight className="h-3 w-3" />
             </button>

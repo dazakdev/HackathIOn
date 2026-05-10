@@ -182,8 +182,6 @@ function TrainingPage() {
 
       {/* Main chat area */}
       <main className="flex-1 flex flex-col bg-background relative">
-        <div className="absolute inset-0 bg-[url('/background.jpg')] bg-cover bg-center opacity-[0.03] pointer-events-none" />
-
         {/* Header */}
         <header className="h-20 border-b border-border flex items-center px-10 justify-between bg-background/80 backdrop-blur-md z-10">
           <div className="flex items-center gap-4">
@@ -243,29 +241,7 @@ function TrainingPage() {
                   </ChatMessage>
                 )}
 
-                {q.score !== null && (
-                  <ChatMessage role="system">
-                    <div className="flex flex-col gap-4 text-left p-2">
-                      <div className="flex items-center justify-between border-b border-border pb-3">
-                        <span className="font-bold text-foreground text-xs uppercase tracking-wider">Ocena Twojej odpowiedzi:</span>
-                        <ScoreIndicator score={q.score} />
-                      </div>
-                      {q.feedback && (
-                        <div className="text-sm text-muted-foreground leading-relaxed italic">
-                          "{q.feedback}"
-                        </div>
-                      )}
-                      {q.ideal_answer && (
-                        <div className="rounded-lg bg-muted/30 p-4 border border-border">
-                          <span className="font-bold text-foreground flex items-center gap-2 mb-2 text-xs uppercase tracking-widest opacity-60">
-                            <Info className="h-3 w-3" /> Wzorcowe wyjaśnienie:
-                          </span>
-                          <p className="text-sm text-muted-foreground leading-relaxed">{q.ideal_answer}</p>
-                        </div>
-                      )}
-                    </div>
-                  </ChatMessage>
-                )}
+
               </div>
             )
           })}
