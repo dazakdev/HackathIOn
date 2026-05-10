@@ -115,6 +115,9 @@ export interface LeaderboardEntry {
   full_name: string | null
   email: string
   total_points: number
+  rank: number
+  is_current_user?: boolean
+  is_footer?: boolean
 }
 
 // ── API calls ──────────────────────────────────────────────────────────────

@@ -16,15 +16,24 @@ function LeaderboardPage() {
   })
 
   const entries = data ?? []
-  const topThree = entries.slice(0, 3)
-  const rest = entries.slice(3, 10)
+  const mainEntries = entries.filter((e) => !e.is_footer)
+  const currentUserEntry = entries.find((e) => e.is_current_user)
+
+  const topThree = mainEntries.slice(0, 3)
+  const rest = mainEntries.slice(3, 10)
+
+  // Check if current user is among the first 10 entries
+  const currentUserIndex = mainEntries.findIndex((e) => e.is_current_user)
+  const isCurrentUserInTopTen = currentUserIndex >= 0 && currentUserIndex < 10
+
+  const footerEntry = !isCurrentUserInTopTen ? currentUserEntry : null
 
   const renderPodium = () => {
     const p1 = topThree[0]
     const p2 = topThree[1]
     const p3 = topThree[2]
 
-    if (entries.length === 0) return null
+    if (mainEntries.length === 0) return null
 
     return (
       <div className="flex items-end justify-center gap-8 md:gap-16 py-16 mb-8 overflow-x-auto min-h-[300px]">
@@ -32,8 +41,14 @@ function LeaderboardPage() {
         {p2 && (
           <div className="flex flex-col items-center group animate-in fade-in slide-in-from-bottom-8 duration-700">
             <div className="relative mb-4">
-              <div className="size-16 rounded-full border-4 border-slate-300 bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-                <span className="text-2xl font-black text-slate-500">2</span>
+              <div
+                className={`size-16 rounded-full border-4 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform ${p2.is_current_user ? "border-primary bg-primary/10" : "border-slate-300 bg-slate-100 dark:bg-slate-800"}`}
+              >
+                <span
+                  className={`text-2xl font-black ${p2.is_current_user ? "text-primary" : "text-slate-500"}`}
+                >
+                  2
+                </span>
               </div>
             </div>
             <div className="h-24 w-32 bg-slate-200/30 dark:bg-slate-800/50 rounded-t-2xl flex flex-col items-center justify-end pb-4 border-x border-t border-slate-300/30 backdrop-blur-sm shadow-xl">
@@ -54,8 +69,14 @@ function LeaderboardPage() {
               <div className="absolute -top-6 left-1/2 -translate-x-1/2 animate-bounce">
                 <Trophy className="size-6 text-yellow-500 fill-yellow-500/20" />
               </div>
-              <div className="size-20 rounded-full border-4 border-yellow-400 bg-yellow-50 dark:bg-yellow-950/30 flex items-center justify-center shadow-[0_0_30px_rgba(250,204,21,0.3)] group-hover:scale-105 transition-transform">
-                <span className="text-2xl font-black text-yellow-600">1</span>
+              <div
+                className={`size-20 rounded-full border-4 flex items-center justify-center shadow-[0_0_30px_rgba(250,204,21,0.3)] group-hover:scale-105 transition-transform ${p1.is_current_user ? "border-primary bg-primary/10" : "border-yellow-400 bg-yellow-50 dark:bg-yellow-950/30"}`}
+              >
+                <span
+                  className={`text-2xl font-black ${p1.is_current_user ? "text-primary" : "text-yellow-600"}`}
+                >
+                  1
+                </span>
               </div>
             </div>
             <div className="h-36 w-36 bg-yellow-400/10 dark:bg-yellow-500/10 rounded-t-2xl flex flex-col items-center justify-end pb-6 border-x border-t border-yellow-400/30 backdrop-blur-md shadow-2xl">
@@ -73,8 +94,14 @@ function LeaderboardPage() {
         {p3 && (
           <div className="flex flex-col items-center group animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
             <div className="relative mb-4">
-              <div className="size-16 rounded-full border-4 border-amber-600/30 bg-amber-50 dark:bg-amber-950/20 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-                <span className="text-2xl font-black text-amber-700">3</span>
+              <div
+                className={`size-16 rounded-full border-4 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform ${p3.is_current_user ? "border-primary bg-primary/10" : "border-amber-600/30 bg-amber-50 dark:bg-amber-950/20"}`}
+              >
+                <span
+                  className={`text-2xl font-black ${p3.is_current_user ? "text-primary" : "text-amber-700"}`}
+                >
+                  3
+                </span>
               </div>
             </div>
             <div className="h-20 w-32 bg-amber-700/10 dark:bg-amber-900/20 rounded-t-2xl flex flex-col items-center justify-end pb-4 border-x border-t border-amber-700/20 backdrop-blur-sm shadow-xl">
@@ -91,34 +118,58 @@ function LeaderboardPage() {
     )
   }
 
+  const renderEntry = (entry: LeaderboardEntry) => (
+    <div
+      key={entry.id}
+      className={`flex items-center justify-between rounded-xl px-5 py-4 text-sm transition-all hover:translate-x-1 duration-200 border ${entry.is_current_user ? "bg-primary/10 border-primary/30 ring-1 ring-primary/20 shadow-lg" : "bg-muted/40 hover:bg-muted/60 border-border/5"}`}
+    >
+      <div className="flex items-center gap-4">
+        <span
+          className={`size-8 rounded-xl flex items-center justify-center text-xs font-black shadow-sm border ${entry.is_current_user ? "bg-primary text-primary-foreground border-primary" : "bg-muted text-muted-foreground border-border/50"}`}
+        >
+          {entry.rank}
+        </span>
+        <span
+          className={`font-bold ${entry.is_current_user ? "text-primary" : "text-foreground"}`}
+        >
+          {entry.full_name ?? entry.email.split("@")[0]}
+          {entry.is_current_user && (
+            <span className="ml-2 text-[10px] font-black uppercase tracking-widest opacity-70">
+              (Ty)
+            </span>
+          )}
+        </span>
+      </div>
+      <span
+        className={`rounded-lg px-3 py-1.5 text-xs font-black tracking-tight ${entry.is_current_user ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"}`}
+      >
+        {entry.total_points.toLocaleString("pl-PL")} XP
+      </span>
+    </div>
+  )
+
   const renderRows = () => (
     <div className="space-y-2">
       {rest.length > 0 ? (
-        rest.map((entry, idx) => (
-          <div
-            key={entry.id}
-            className="flex items-center justify-between rounded-xl bg-muted/40 hover:bg-muted/60 px-5 py-4 text-sm transition-all hover:translate-x-1 duration-200 border border-border/5"
-          >
-            <div className="flex items-center gap-4">
-              <span className="size-8 rounded-xl bg-muted flex items-center justify-center text-xs font-black text-muted-foreground shadow-sm border border-border/50">
-                {idx + 4}
-              </span>
-              <span className="font-bold text-foreground">
-                {entry.full_name ?? entry.email.split("@")[0]}
-              </span>
-            </div>
-            <span className="rounded-lg bg-primary/10 text-primary px-3 py-1.5 text-xs font-black tracking-tight">
-              {entry.total_points.toLocaleString("pl-PL")} XP
-            </span>
-          </div>
-        ))
-      ) : entries.length <= 3 ? (
+        rest.map((entry) => renderEntry(entry))
+      ) : mainEntries.length <= 3 ? (
         <div className="text-center text-xs text-muted-foreground py-12 italic opacity-50">
           Więcej uczniów wkrótce...
         </div>
       ) : (
         <div className="text-center text-sm text-muted-foreground py-12">
           Brak wyników
+        </div>
+      )}
+
+      {footerEntry && (
+        <div className="pt-4 mt-4 border-t border-border/50">
+          <div className="flex items-center gap-2 mb-4 px-4">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              Twoja Pozycja
+            </span>
+          </div>
+          {renderEntry(footerEntry)}
         </div>
       )}
     </div>

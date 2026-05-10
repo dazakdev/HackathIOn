@@ -139,23 +139,49 @@ def _get_game(session: SessionDep, game_id: uuid.UUID, current_user: User) -> Ga
 # ─── Leaderboard (must come before /{game_id} routes) ────────────────────────
 
 @router.get("/leaderboard")
-def get_leaderboard(session: SessionDep, _: CurrentUser) -> list[dict[str, Any]]:
+def get_leaderboard(
+    session: SessionDep, 
+    current_user: CurrentUser
+) -> list[dict[str, Any]]:
+    # Get top 20 users
     stmt = (
         select(User)
         .where(User.is_active == True)  # noqa: E712
         .order_by(col(User.total_points).desc())
         .limit(20)
     )
-    users = session.exec(stmt).all()
-    return [
-        {
+    top_users = session.exec(stmt).all()
+    
+    result = []
+    for idx, u in enumerate(top_users):
+        result.append({
             "id": str(u.id),
             "full_name": u.full_name,
             "email": u.email,
             "total_points": u.total_points,
-        }
-        for u in users
-    ]
+            "rank": idx + 1,
+            "is_current_user": u.id == current_user.id
+        })
+    
+    # Check if current user is in top_users
+    is_in_top = any(u.id == current_user.id for u in top_users)
+    
+    if not is_in_top:
+        # Calculate current user's rank
+        rank_stmt = select(func.count(User.id)).where(User.total_points > current_user.total_points)
+        rank = session.exec(rank_stmt).one() + 1
+        
+        result.append({
+            "id": str(current_user.id),
+            "full_name": current_user.full_name,
+            "email": current_user.email,
+            "total_points": current_user.total_points,
+            "rank": rank,
+            "is_current_user": True,
+            "is_footer": True # Flag for UI to show it at the bottom
+        })
+        
+    return result
 
 
 # ─── Game CRUD ───────────────────────────────────────────────────────────────
