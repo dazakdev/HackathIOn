@@ -3,7 +3,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import {
   CheckCircle,
   ChevronRight,
-  Clock3,
   Loader2,
   Moon,
   Sun,
@@ -317,7 +316,6 @@ function QuizPage() {
                 <Moon className="h-3.5 w-3.5 text-primary" />
               )}
             </button>
-
           </div>
         </header>
 

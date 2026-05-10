@@ -14,6 +14,8 @@ def create_game_with_mcq(
     user_id: uuid.UUID,
     text: str,
     question_count: int | None = None,
+    difficulty: str = "medium",
+    icon: str = "sparkles",
 ) -> tuple[Game, list[QuizQuestion]]:
     quiz = generate_mcq_quiz(text, question_count=question_count)
     game = Game(
@@ -22,6 +24,8 @@ def create_game_with_mcq(
         source_text=text,
         reading_progress=0,
         status="quiz_ready",
+        difficulty=difficulty,
+        icon=icon,
     )
     session.add(game)
     session.flush()

@@ -4,9 +4,9 @@ from dataclasses import dataclass
 
 from sqlmodel import Session, col, select
 
-from app.models import BossBattle, TrainingQuestion, get_datetime_utc
+from app.models import BossBattle, Game, TrainingQuestion, get_datetime_utc
 
-DIFFICULTY_MULTIPLIER: dict[str, float] = {"easy": 1.0, "medium": 1.5, "hard": 2.5}
+DIFFICULTY_MULTIPLIER: dict[str, float] = {"easy": 1.0, "medium": 1.5, "hard": 2.0}
 BASE_DAMAGE = 10
 BOSS_HP_BASE = 100
 
@@ -92,8 +92,13 @@ def simulate_boss_battle(
 
     accuracy_avg = total_score / len(questions)
     victory = boss_hp <= 0
-    success_rate = min(total_damage / boss_hp_start, 1.0) if boss_hp_start > 0 else 0.0
-    xp_gained = int(success_rate * 100 * len(questions))
+    
+    # Get difficulty multiplier from game
+    game_stmt = select(Game).where(Game.id == boss_battle.game_id)
+    game = session.exec(game_stmt).first()
+    multiplier = DIFFICULTY_MULTIPLIER.get(game.difficulty if game else "medium", 1.0)
+    
+    xp_gained = int(accuracy_avg * multiplier * 10)
 
     boss_battle.boss_hp_end = boss_hp
     boss_battle.player_damage_total = total_damage

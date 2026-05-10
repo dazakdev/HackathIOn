@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import useAuth from "@/hooks/useAuth"
 import { GamesApi } from "@/lib/gameApi"
-
+const ICON_MAP: Record<string, string> = {
+  zap: "⚡",
+  sparkles: "✨",
+  brain: "🧠",
+}
 export const Route = createFileRoute("/_layout/")({
   component: Dashboard,
   head: () => ({ meta: [{ title: "Dashboard - Sensai" }] }),
@@ -131,8 +135,8 @@ function Dashboard() {
               >
                 <div className="h-full rounded-lg border border-border bg-card shadow-lg p-6 transition-all duration-200 group-hover:shadow-lg group-hover:border-primary/40 group-hover:-translate-y-1">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="size-9 rounded-md bg-muted flex items-center justify-center transition-colors group-hover:bg-primary/10">
-                      <BookOpen className="h-4 w-4 transition-colors group-hover:text-primary" />
+                    <div className="size-9 rounded-md bg-muted flex items-center justify-center transition-colors group-hover:bg-primary/10 text-lg">
+                      {ICON_MAP[g.icon] ?? "✨"}
                     </div>
                     <span className="text-[11px] uppercase tracking-widest bg-muted px-3 py-1 rounded-md text-muted-foreground">
                       {g.reading_progress >= 100 ? "Trening" : "Quiz"}
@@ -178,8 +182,8 @@ function Dashboard() {
               >
                 <div className="h-full rounded-lg border border-border bg-card/40 shadow-sm p-6 transition-all duration-200 group-hover:shadow-md group-hover:border-primary/20 group-hover:-translate-y-1">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="size-9 rounded-md bg-primary/10 flex items-center justify-center text-primary">
-                      <Award className="h-4 w-4" />
+                    <div className="size-9 rounded-md bg-primary/10 flex items-center justify-center text-lg">
+                      {ICON_MAP[g.icon] ?? "✨"}
                     </div>
                     <span className="text-[10px] uppercase tracking-widest bg-green-500/5 px-2.5 py-1 rounded-md text-green-500/70 font-medium border border-green-500/10">
                       Ukończono
@@ -203,8 +207,6 @@ function Dashboard() {
           </div>
         </section>
       )}
-
-
     </div>
   )
 }

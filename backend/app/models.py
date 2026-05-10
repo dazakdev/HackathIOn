@@ -87,6 +87,8 @@ class Game(SQLModel, table=True):
     source_text: str
     reading_progress: int = Field(default=0)
     status: str | None = None
+    difficulty: str | None = Field(default="medium")
+    icon: str | None = Field(default="sparkles")
     final_score: int | None = None
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,
@@ -202,7 +204,7 @@ class TrainingQuestion(SQLModel, table=True):
     user_answer: str | None = None
     score: int | None = None
     feedback: str | None = None
-    difficulty: str
+    difficulty: str | None = None
     order_index: int
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,

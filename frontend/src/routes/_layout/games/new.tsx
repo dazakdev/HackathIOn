@@ -16,7 +16,11 @@ import { Input } from "@/components/ui/input"
 import { GamesApi } from "@/lib/gameApi"
 import { useGameStore } from "@/stores/gameStore"
 
-const ICONS = ["⚡", "✨", "🧠"] as const
+const ICONS = [
+  { id: "zap", char: "⚡" },
+  { id: "sparkles", char: "✨" },
+  { id: "brain", char: "🧠" },
+] as const
 
 export const Route = createFileRoute("/_layout/games/new")({
   component: NewGame,
@@ -32,12 +36,15 @@ function NewGame() {
   const [description, setDescription] = useState("")
   const [text, setText] = useState("")
   const [difficulty, setDifficulty] = useState("easy")
-  const [selectedIcon, setSelectedIcon] = useState("✨")
+  const [selectedIcon, setSelectedIcon] = useState("sparkles")
 
   const { mutate, isPending } = useMutation({
-    mutationFn: (source_text: string) => GamesApi.createGame(source_text),
-    // Note: The backend currently only accepts source_text, but we keep the other
-    // state (title, difficulty) locally ready for when the API is updated.
+    mutationFn: ({
+      text,
+      difficulty,
+      icon,
+    }: { text: string; difficulty: string; icon: string }) =>
+      GamesApi.createGame(text, difficulty, icon),
     onSuccess: (data) => {
       setGame(data.id, "quiz")
       toast.success("Gra utworzona! Quiz gotowy.")
@@ -118,12 +125,12 @@ function NewGame() {
                     {ICONS.map((icon) => (
                       <button
                         type="button"
-                        key={icon}
-                        onClick={() => setSelectedIcon(icon)}
+                        key={icon.id}
+                        onClick={() => setSelectedIcon(icon.id)}
                         disabled={isPending}
-                        className={`size-9 rounded-full border text-sm transition-all duration-200 ${selectedIcon === icon ? "bg-primary text-primary-foreground border-primary shadow-md scale-110" : "bg-background/70 dark:bg-black/20 border-border hover:border-primary/40 hover:scale-105"}`}
+                        className={`size-9 rounded-full border text-sm transition-all duration-200 ${selectedIcon === icon.id ? "bg-primary text-primary-foreground border-primary shadow-md scale-110" : "bg-background/70 dark:bg-black/20 border-border hover:border-primary/40 hover:scale-105"}`}
                       >
-                        {icon}
+                        {icon.char}
                       </button>
                     ))}
                   </div>
@@ -218,7 +225,9 @@ function NewGame() {
             size="lg"
             className="rounded-lg px-10 py-6 text-base font-semibold shadow-xl"
             disabled={isPending || text.trim().length < 80}
-            onClick={() => mutate(text.trim())}
+            onClick={() =>
+              mutate({ text: text.trim(), difficulty, icon: selectedIcon })
+            }
           >
             {isPending ? (
               <>

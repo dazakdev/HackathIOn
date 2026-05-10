@@ -35,6 +35,8 @@ router = APIRouter(tags=["games"])
 
 class GameCreateRequest(BaseModel):
     source_text: str
+    difficulty: str = "medium"
+    icon: str = "sparkles"
 
 
 class ProgressUpdateRequest(BaseModel):
@@ -58,6 +60,8 @@ def _game_dict(game: Game) -> dict[str, Any]:
         "title": game.title,
         "description": game.description,
         "status": game.status,
+        "difficulty": game.difficulty,
+        "icon": game.icon,
         "reading_progress": game.reading_progress,
         "final_score": game.final_score,
         "created_at": game.created_at,
@@ -145,6 +149,8 @@ def create_game(
         session=session,
         user_id=current_user.id,
         text=body.source_text,
+        difficulty=body.difficulty,
+        icon=body.icon,
     )
     result = _game_detail_dict(game)
     result["questions"] = [_question_dict(q) for q in questions]

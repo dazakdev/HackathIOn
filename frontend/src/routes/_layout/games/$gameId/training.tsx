@@ -5,7 +5,6 @@ import {
   BookOpen,
   Bot,
   ChevronRight,
-  Clock3,
   Info,
   Loader2,
   Moon,
@@ -27,20 +26,19 @@ export const Route = createFileRoute("/_layout/games/$gameId/training")({
   head: () => ({ meta: [{ title: "Trening - Sensai" }] }),
 })
 
-
 function ChatMessage({
-  role,
+  userRole,
   content,
   isSystem = false,
   children,
 }: {
-  role: "student" | "sensai" | "system"
+  userRole: "student" | "sensai" | "system"
   content?: string
   isSystem?: boolean
   children?: React.ReactNode
 }) {
-  const isStudent = role === "student"
-  const isSensai = role === "sensai"
+  const isStudent = userRole === "student"
+  const isSensai = userRole === "sensai"
 
   if (isSystem) {
     return (
@@ -139,6 +137,22 @@ function TrainingPage() {
     }
   }, [])
 
+  const { mutate: startBattle, isPending: isStartingBattle } = useMutation({
+    mutationFn: () => GamesApi.startBossBattle(gameId),
+    onSuccess: () => {
+      setPhase("summary")
+      queryClient.invalidateQueries({ queryKey: ["games"] })
+      navigate({ to: "/games/$gameId/summary", params: { gameId } })
+    },
+    onError: (err: any) => {
+      toast.error(
+        err?.response?.data?.detail ??
+        err?.message ??
+        "Nie udało się rozpocząć walki",
+      )
+    },
+  })
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background gap-4">
@@ -153,20 +167,6 @@ function TrainingPage() {
   const toggleTheme = () => {
     setTheme(resolvedTheme === "dark" ? "light" : "dark")
   }
-
-  const { mutate: startBattle, isPending: isStartingBattle } = useMutation({
-    mutationFn: () => GamesApi.startBossBattle(gameId),
-    onSuccess: () => {
-      setPhase("summary")
-      queryClient.invalidateQueries({ queryKey: ["games"] })
-      navigate({ to: "/games/$gameId/summary", params: { gameId } })
-    },
-    onError: (err: any) => {
-      toast.error(
-        err?.response?.data?.detail ?? err?.message ?? "Nie udało się rozpocząć walki",
-      )
-    },
-  })
 
   const goToBoss = () => {
     startBattle()
@@ -204,7 +204,6 @@ function TrainingPage() {
 
         <div className="flex-1 flex flex-col items-center justify-center gap-10">
           <div className="relative">
-
             <img
               src="/ninja/fight.gif"
               alt="Uczeń"
@@ -278,7 +277,6 @@ function TrainingPage() {
                   <Moon className="h-4.5 w-4.5 text-primary" />
                 )}
               </button>
-
             </div>
           </div>
         </header>
@@ -293,7 +291,7 @@ function TrainingPage() {
 
             return (
               <div key={q.id} className="mb-12">
-                <ChatMessage role="student">
+                <ChatMessage userRole="student">
                   <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-primary">
                     Pytanie od ucznia {idx + 1}
                   </div>
@@ -301,7 +299,7 @@ function TrainingPage() {
                 </ChatMessage>
 
                 {q.user_answer && (
-                  <ChatMessage role="sensai">
+                  <ChatMessage userRole="sensai">
                     <p className="text-base leading-relaxed">{q.user_answer}</p>
                   </ChatMessage>
                 )}
@@ -310,7 +308,7 @@ function TrainingPage() {
           })}
 
           {isPending && (
-            <ChatMessage role="system" isSystem>
+            <ChatMessage userRole="system" isSystem>
               <div className="flex items-center gap-3 py-2">
                 <Loader2 className="h-5 w-5 animate-spin text-primary" />
                 <span className="font-medium text-muted-foreground">
@@ -336,7 +334,8 @@ function TrainingPage() {
                 className="w-full max-w-sm gap-3 font-bold h-14 text-lg shadow-xl"
                 onClick={goToBoss}
               >
-                Zakończ trening i sprawdź wyniki <ChevronRight className="h-6 w-6" />
+                Zakończ trening i sprawdź wyniki{" "}
+                <ChevronRight className="h-6 w-6" />
               </Button>
             </div>
           ) : (

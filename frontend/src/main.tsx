@@ -50,7 +50,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           richColors
           closeButton
           toastOptions={{
-            className: "backdrop-blur-xl bg-background/60 border-border shadow-2xl",
+            className:
+              "backdrop-blur-xl bg-background/60 border-border shadow-2xl",
           }}
         />
       </QueryClientProvider>

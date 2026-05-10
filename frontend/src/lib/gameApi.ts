@@ -17,6 +17,8 @@ export interface GameSummary {
   title: string
   status: string | null
   reading_progress: number
+  difficulty: string
+  icon: string
   final_score: number | null
   created_at: string
   completed_at: string | null
@@ -116,10 +118,16 @@ export interface LeaderboardEntry {
 // ── API calls ──────────────────────────────────────────────────────────────
 
 export const GamesApi = {
-  createGame: (source_text: string) =>
+  createGame: (
+    source_text: string,
+    difficulty: string = "medium",
+    icon: string = "✨",
+  ) =>
     api
       .post<GameDetail & { questions: QuizQuestionData[] }>("/games/", {
         source_text,
+        difficulty,
+        icon,
       })
       .then((r) => r.data),
 

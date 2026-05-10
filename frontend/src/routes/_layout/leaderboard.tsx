@@ -1,14 +1,12 @@
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
-import { Loader2, Trophy, Medal, User } from "lucide-react"
+import { Loader2, Medal, Trophy } from "lucide-react"
 import { GamesApi } from "@/lib/gameApi"
 
 export const Route = createFileRoute("/_layout/leaderboard")({
   component: LeaderboardPage,
   head: () => ({ meta: [{ title: "Ranking - Sensai" }] }),
 })
-
-const MEDALS = ["1st", "2nd", "3rd"]
 
 function LeaderboardPage() {
   const { data, isLoading } = useQuery({
@@ -94,12 +92,12 @@ function LeaderboardPage() {
             className="flex items-center justify-between rounded-xl bg-muted/40 hover:bg-muted/60 px-5 py-4 text-sm transition-colors border border-border/5"
           >
             <div className="flex items-center gap-4">
-               <span className="size-8 rounded-xl bg-muted flex items-center justify-center text-xs font-black text-muted-foreground shadow-sm border border-border/50">
-                 {idx + 4}
-               </span>
-               <span className="font-bold text-foreground">
-                 {entry.full_name ?? entry.email.split("@")[0]}
-               </span>
+              <span className="size-8 rounded-xl bg-muted flex items-center justify-center text-xs font-black text-muted-foreground shadow-sm border border-border/50">
+                {idx + 4}
+              </span>
+              <span className="font-bold text-foreground">
+                {entry.full_name ?? entry.email.split("@")[0]}
+              </span>
             </div>
             <span className="rounded-lg bg-primary/10 text-primary px-3 py-1.5 text-xs font-black tracking-tight">
               {entry.total_points.toLocaleString("pl-PL")} XP
@@ -124,27 +122,29 @@ function LeaderboardPage() {
         <>
           <section className="rounded-2xl border border-border bg-card/50 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-10 overflow-hidden relative">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-30" />
-            
+
             <div className="flex flex-col items-center mb-10 text-center">
-               <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
-                  <Trophy className="size-6" />
-               </div>
-               <h2 className="text-3xl font-black text-foreground tracking-tight">
-                 Ranking Mistrzów
-               </h2>
-               <p className="text-sm text-muted-foreground mt-2">
-                 Najlepsi uczniowie w krainie wiedzy
-               </p>
+              <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
+                <Trophy className="size-6" />
+              </div>
+              <h2 className="text-3xl font-black text-foreground tracking-tight">
+                Ranking Mistrzów
+              </h2>
+              <p className="text-sm text-muted-foreground mt-2">
+                Najlepsi uczniowie w krainie wiedzy
+              </p>
             </div>
 
             {renderPodium()}
-            
+
             <div className="max-w-2xl mx-auto">
-               <div className="flex items-center gap-2 mb-4 px-4">
-                  <Medal className="size-4 text-muted-foreground" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Top 10 Uczniów</span>
-               </div>
-               {renderRows()}
+              <div className="flex items-center gap-2 mb-4 px-4">
+                <Medal className="size-4 text-muted-foreground" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                  Top 10 Uczniów
+                </span>
+              </div>
+              {renderRows()}
             </div>
           </section>
         </>
