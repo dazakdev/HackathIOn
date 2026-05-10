@@ -89,7 +89,10 @@ def normalize_input(state: MCQState) -> MCQState:
 
 
 def generate_mcq(state: MCQState) -> MCQState:
-    response = _generate_content(_generation_prompt(state["text"], state["question_count"]))
+    response = _generate_content(
+        _generation_prompt(state["text"], state["question_count"]),
+        question_count=state["question_count"],
+    )
     return {**state, "raw_response": response}
 
 
@@ -110,7 +113,8 @@ def repair_mcq(state: MCQState) -> MCQState:
             raw_response=state["raw_response"],
             errors=state.get("errors", []),
             question_count=state["question_count"],
-        )
+        ),
+        question_count=state["question_count"],
     )
     return {**state, "raw_response": response, "attempts": attempts}
 
@@ -123,9 +127,9 @@ def should_retry_or_finish(state: MCQState) -> Literal["repair", "finish"]:
     return "finish"
 
 
-def _generate_content(prompt: str) -> str:
+def _generate_content(prompt: str, question_count: int = 5) -> str:
     if not settings.GEMINI_API_KEY:
-        raise ValueError("GEMINI_API_KEY is required to call Gemini Flash")
+        return _generate_stub_mcq(question_count)
 
     client = genai.Client(api_key=settings.GEMINI_API_KEY)
     response = client.models.generate_content(
@@ -141,6 +145,30 @@ def _generate_content(prompt: str) -> str:
     if not response.text:
         raise ValueError("Gemini returned an empty response")
     return response.text
+
+
+def _generate_stub_mcq(question_count: int) -> str:
+    questions = []
+    for i in range(question_count):
+        questions.append(
+            {
+                "question": f"To jest przykładowe pytanie nr {i+1} (Stub)",
+                "answers": {
+                    "A": "To jest poprawna odpowiedź",
+                    "B": "To jest błędna odpowiedź 1",
+                    "C": "To jest błędna odpowiedź 2",
+                    "D": "To jest błędna odpowiedź 3",
+                },
+                "correct_answer": "A",
+                "explanation": f"Wyjaśnienie dla pytania nr {i+1}. Ten quiz jest wygenerowany w trybie testowym, ponieważ nie podano klucza API Gemini.",
+            }
+        )
+
+    stub_quiz = {
+        "title": "Przykładowy Quiz (Mock)",
+        "questions": questions,
+    }
+    return json.dumps(stub_quiz, ensure_ascii=False)
 
 
 def _system_prompt() -> str:

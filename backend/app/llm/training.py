@@ -53,6 +53,7 @@ def generate_student_questions(
     response = _generate_content(
         prompt=_questions_prompt(text, count, selected_difficulty),
         response_schema=GeneratedTrainingQuestions,
+        question_count=count,
     )
     return GeneratedTrainingQuestions.model_validate(_extract_json_object(response))
 
@@ -95,9 +96,18 @@ def _normalize_training_difficulty(difficulty: str) -> TrainingDifficulty:
     raise ValueError("Training difficulty must be easy, medium, hard or mixed")
 
 
-def _generate_content(*, prompt: str, response_schema: type[BaseModel]) -> str:
+def _generate_content(
+    *,
+    prompt: str,
+    response_schema: type[BaseModel],
+    question_count: int = 5,
+) -> str:
     if not settings.GEMINI_API_KEY:
-        raise ValueError("GEMINI_API_KEY is required to call Gemini Flash")
+        if response_schema == GeneratedTrainingQuestions:
+            return _generate_stub_training(question_count)
+        if response_schema == SenseiAnswerEvaluation:
+            return _generate_stub_evaluation()
+        raise ValueError(f"No stub implemented for {response_schema}")
 
     client = genai.Client(api_key=settings.GEMINI_API_KEY)
     response = client.models.generate_content(
@@ -113,6 +123,32 @@ def _generate_content(*, prompt: str, response_schema: type[BaseModel]) -> str:
     if not response.text:
         raise ValueError("Gemini returned an empty response")
     return response.text
+
+
+def _generate_stub_training(question_count: int) -> str:
+    questions = []
+    for i in range(question_count):
+        questions.append(
+            {
+                "question_text": f"Przykładowe pytanie od ucznia nr {i+1} (Stub)",
+                "ideal_answer": f"To jest wzorcowa odpowiedź na pytanie nr {i+1}. (Tryb Mock)",
+                "difficulty": "medium",
+            }
+        )
+
+    stub_training = {
+        "title": "Przykładowy Trening (Mock)",
+        "questions": questions,
+    }
+    return json.dumps(stub_training, ensure_ascii=False)
+
+
+def _generate_stub_evaluation() -> str:
+    stub_eval = {
+        "score": 85,
+        "feedback": "Twoja odpowiedź jest bardzo dobra! (To jest ocena w trybie testowym, ponieważ nie podano klucza API Gemini).",
+    }
+    return json.dumps(stub_eval, ensure_ascii=False)
 
 
 def _system_prompt() -> str:
