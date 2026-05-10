@@ -31,22 +31,22 @@ function OptionButton({
   onClick: () => void
 }) {
   let cls =
-    "w-full text-left rounded-lg border px-4 py-3 text-sm transition-all duration-200 flex items-start gap-3 "
+    "w-full text-left bg-secondary/50 rounded-lg border px-4 py-3 text-sm transition-all duration-200 flex items-start gap-3 "
   if (!revealed) {
     cls += selected
-      ? "border-primary bg-primary/10"
+      ? "border-primary bg-primary/20"
       : "border-border/60 bg-card/80 hover:border-primary/40 hover:bg-card"
   } else if (correct) {
     cls += "border-green-500 bg-green-500/10 text-green-600 dark:text-green-400 font-medium"
   } else if (selected && !correct) {
     cls += "border-red-500 bg-red-500/10 text-red-600 dark:text-red-400 font-medium"
   } else {
-    cls += "border-border/50 opacity-60"
+    cls += "border-border/50"
   }
 
   return (
     <button className={cls} onClick={revealed ? undefined : onClick} disabled={revealed}>
-      <span className={`shrink-0 size-8 rounded-md border flex items-center justify-center text-xs font-semibold ${selected ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground"}`}>
+      <span className={`shrink-0 size-8 rounded-md border flex items-center justify-center text-xs font-semibold ${selected ? "border-primary/20 bg-primary/20 text-primary-foreground" : "border-border text-muted-foreground"}`}>
         {label}
       </span>
       <span className="leading-relaxed text-sm">{text}</span>
@@ -73,10 +73,10 @@ function QuestionCard({
   } | null>(
     existingAnswer?.selected_option
       ? {
-          is_correct: existingAnswer.is_correct ?? false,
-          correct_answer: "",
-          explanation: null,
-        }
+        is_correct: existingAnswer.is_correct ?? false,
+        correct_answer: "",
+        explanation: null,
+      }
       : null,
   )
 
@@ -95,6 +95,8 @@ function QuestionCard({
     onError: () => toast.error("Błąd zapisu odpowiedzi"),
   })
 
+  const [showExplanation, setShowExplanation] = useState(false)
+
   const opts: Record<string, string> = {
     A: question.option_a,
     B: question.option_b,
@@ -102,6 +104,27 @@ function QuestionCard({
     D: question.option_d,
   }
   const revealed = result !== null
+
+  if (showExplanation && result?.explanation) {
+    return (
+      <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+        <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-widest">
+          <CheckCircle className="h-4 w-4" /> Wyjaśnienie
+        </div>
+        <div className="bg-primary/5 border border-primary/10 rounded-xl p-5 text-sm leading-relaxed text-foreground/80 italic">
+          "{result.explanation}"
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-xs font-bold uppercase tracking-wider"
+          onClick={() => setShowExplanation(false)}
+        >
+          Powrót do pytania
+        </Button>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-5">
@@ -134,11 +157,26 @@ function QuestionCard({
       )}
 
       {revealed && result && (
-        <div className="rounded-md px-4 py-2 text-xs font-semibold bg-green-500/20 text-green-700 dark:text-green-300 flex items-center gap-2">
-          <CheckCircle className="h-4 w-4" />
-          {result.is_correct
-            ? "Doskonale! To kluczowa zasada dychotomii kontroli."
-            : `Błędna odpowiedź. Poprawna: ${result.correct_answer}`}
+        <div className="flex flex-col gap-3">
+          <div className={`rounded-md px-4 py-2 text-xs font-semibold flex items-center gap-2 ${
+            result.is_correct 
+              ? "bg-green-500/20 text-green-700 dark:text-green-300" 
+              : "bg-red-500/20 text-red-700 dark:text-red-300"
+          }`}>
+            <CheckCircle className="h-4 w-4" />
+            {result.is_correct
+              ? "Doskonale! To poprawna odpowiedź."
+              : `Błędna odpowiedź. Poprawna to ${result.correct_answer}.`}
+          </div>
+          
+          {result.explanation && (
+            <button
+              onClick={() => setShowExplanation(true)}
+              className="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline flex items-center gap-1.5 px-1"
+            >
+              Zobacz wyjaśnienie <ChevronRight className="h-3 w-3" />
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -218,7 +256,7 @@ function QuizPage() {
 
   return (
     <div className="min-h-svh bg-[url('/background.jpg')] bg-cover bg-center relative">
-      <div className="absolute inset-0 bg-background/75 dark:bg-black/70" />
+      <div className="absolute inset-0 bg-background/30 dark:bg-background/60" />
 
       <div className="relative z-10 flex flex-col min-h-svh">
         <header className="h-12 bg-background/90 border-b border-border flex items-center px-6 text-sm">
@@ -247,8 +285,8 @@ function QuizPage() {
         </header>
 
         <div className="flex-1 flex items-center justify-center px-6 py-10">
-          <div className="w-full max-w-5xl grid md:grid-cols-[1.5fr_1fr] gap-0 rounded-xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.25)]">
-            <section className="bg-white/95 dark:bg-[#2f2f2f]/90 p-8">
+          <div className="w-full max-w-5xl h-[600px] grid md:grid-cols-[1.5fr_1fr] gap-0 rounded-xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.25)]">
+            <section className="bg-white/95 dark:bg-card/90 p-8 flex flex-col h-full overflow-hidden">
               <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-6">
                 <span className="rounded-md bg-muted px-3 py-1">Filozofia</span>
               </div>
@@ -259,7 +297,7 @@ function QuizPage() {
               <div
                 ref={sourceRef}
                 onScroll={handleScroll}
-                className="text-sm leading-relaxed whitespace-pre-wrap max-h-[420px] overflow-y-auto pr-4"
+                className="text-sm leading-relaxed whitespace-pre-wrap flex-1 overflow-y-auto pr-4 min-h-0"
               >
                 {quiz.source_text ?? (
                   <span className="text-muted-foreground italic">
@@ -269,13 +307,13 @@ function QuizPage() {
               </div>
             </section>
 
-            <section className="bg-[#f4f2f5]/95 dark:bg-[#323232]/90 p-8 flex flex-col justify-between">
-              <div className="space-y-6">
+            <section className="bg-[#f4f2f5]/25 dark:bg-secondary/20 backdrop-blur-md p-8 flex flex-col h-full overflow-hidden">
+              <div className="flex-1 overflow-y-auto pr-2 space-y-6 min-h-0">
                 <div className="flex items-center gap-2 text-sm font-semibold">
                   <span className="size-6 rounded-md bg-primary/20 flex items-center justify-center text-primary">?</span>
                   {quiz.status === "training_ready" ? "Quiz ukończony!" : "Sprawdź wiedzę"}
                 </div>
-                
+
                 {quiz.status === "training_ready" ? (
                   <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4 py-10">
                     <div className="size-16 rounded-full bg-green-500/20 flex items-center justify-center text-green-500 mb-2">

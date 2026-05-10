@@ -141,29 +141,26 @@ function NewGame() {
                   key={lvl.id}
                   onClick={() => setDifficulty(lvl.id)}
                   disabled={isPending}
-                  className={`w-full text-left p-4 rounded-lg border transition-all duration-200 ${
-                    difficulty === lvl.id
+                  className={`w-full text-left p-4 rounded-lg border transition-all duration-200 ${difficulty === lvl.id
                       ? "border-primary bg-primary/10"
                       : "border-border/60 bg-background/60 dark:bg-black/20 hover:border-primary/30"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     {/* Circular radio indicator */}
                     <div
-                      className={`size-5 shrink-0 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-                        difficulty === lvl.id
+                      className={`size-5 shrink-0 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${difficulty === lvl.id
                           ? "border-primary"
                           : "border-muted-foreground/50"
-                      }`}
+                        }`}
                     >
                       {difficulty === lvl.id && (
                         <div className="size-2.5 rounded-full bg-primary" />
                       )}
                     </div>
                     <div>
-                      <div className={`text-sm font-semibold ${
-                        lvl.id === "hard" ? "text-primary" : ""
-                      }`}>{lvl.label}</div>
+                      <div className={`text-sm font-semibold ${lvl.id === "hard" ? "text-primary" : ""
+                        }`}>{lvl.label}</div>
                       <div className="text-xs text-muted-foreground">{lvl.desc}</div>
                     </div>
                   </div>
