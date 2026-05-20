@@ -60,3 +60,9 @@ Po zakończeniu walki wyświetlana jest strona podsumowująca:
 Wszystkie zdobyte punkty XP sumują się i wpływają na pozycję w ogólnodostępnym rankingu:
 1.  **Top 10 Dzisiaj:** Najlepsi gracze z bieżącej doby.
 2.  **Top 10 Wszech czasów:** Legendarne wyniki najlepszych użytkowników aplikacji.
+
+---
+
+## Stos Technologiczny
+
+Aplikacja została zbudowana w architekturze typu full-stack z wykorzystaniem nowoczesnych i wydajnych technologii. Część serwerowa (backend) opiera się na języku **Python**, frameworku **FastAPI** oraz bibliotece **SQLModel** do integracji z bazą danych **PostgreSQL** (zarządzaną za pomocą migracji **Alembic**), a inteligentne funkcjonalności RPG i generowanie pytań wspierane są przez silnik agentowy **LangGraph** oraz oficjalny pakiet **Google GenAI SDK**. Warstwa kliencka (frontend) została zaimplementowana w języku **TypeScript** z użyciem biblioteki **React 19** (budowanej przez **Vite** i zarządzanej przez **Bun**), ze stanem obsługiwanym przez **Zustand**, nawigacją opartą o **TanStack Router**, zapytaniami **TanStack Query** oraz nowoczesnym stylowaniem przy użyciu **Tailwind CSS v4** i komponentów bazujących na **Radix UI**. Całość środowiska uruchomieniowego jest w pełni skonteneryzowana za pomocą **Docker** i **Docker Compose**, co zapewnia spójność wdrożeniową i łatwe skalowanie dzięki odwrotnemu proxy **Traefik**.
